@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import useStore from "@/utils/store";
+import EmployeeAttendancePage from "@/components/employeeattendence";
 
 function ManagerPage({ params }) {
   const managerId = params.id;
@@ -17,7 +18,8 @@ function ManagerPage({ params }) {
       <h2>{name}</h2>
       <ul>
         {employees.map(employee => (
-          <li key={employee.id}>{employee.name}</li>
+          <li key={employee.id}>            <EmployeeAttendancePage employee={employee} />
+          </li>
         ))}
       </ul>
     </div>
