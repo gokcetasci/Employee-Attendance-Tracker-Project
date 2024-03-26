@@ -1,5 +1,4 @@
 import React from 'react';
-import useStore from '@/utils/store';
 
 const EmployeeAttendancePage = ({ employee }) => {
   const handleAttendanceChange = (date, status, explanation) => {
