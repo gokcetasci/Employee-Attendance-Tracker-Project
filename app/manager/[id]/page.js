@@ -1,30 +1,35 @@
-"use client";
+"use client"
 import React from "react";
 import useStore from "@/utils/store";
 import AttendanceCalendar from "@/components/generalcalendar";
 
 function ManagerPage({ params }) {
-  const managerId = params.id;
+  const managerId = parseInt(params.id);
   const { admin } = useStore();
 
   // Manager ID'sine göre ilgili manager'ı bul
-  const branch = admin.branches.find(branch => branch.manager.id === parseInt(managerId));
+  const branch = admin.branches.find((branch) => branch.manager.id === managerId);
   if (!branch) return <div>Manager not found!</div>;
 
   const { name, employees } = branch.manager;
 
+  // İlgili yöneticinin çalışanlarını filtrele
+  const managerEmployees = employees.filter(employee => employee.managerId === managerId);
+ 
   return (
     <div>
       <h2>{name}</h2>
       <ul>
-        {employees.map(employee => (
-          <li key={employee.id}>            {employee.name}
-          </li>
+        {employees.map((employee) => (
+          <li key={employee.id}>{employee.name}</li>
         ))}
       </ul>
-      <AttendanceCalendar/>
+    
+      <AttendanceCalendar employees={managerEmployees} />
     </div>
   );
 }
 
 export default ManagerPage;
+
+
