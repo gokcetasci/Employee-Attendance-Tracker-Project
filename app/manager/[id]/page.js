@@ -14,13 +14,13 @@ function ManagerPage({ params }) {
   const { name, employees } = branch.manager;
 
   // İlgili yöneticinin çalışanlarını filtrele
-  const managerEmployees = employees.filter(employee => employee.managerId === managerId);
+  const managerEmployees = employees;
  
   return (
     <div>
       <h2>{name}</h2>
       <ul>
-        {employees.map((employee) => (
+        {managerEmployees.map((employee) => (
           <li key={employee.id}>{employee.name}</li>
         ))}
       </ul>
@@ -31,5 +31,3 @@ function ManagerPage({ params }) {
 }
 
 export default ManagerPage;
-
-
