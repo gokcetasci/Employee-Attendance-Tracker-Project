@@ -3,7 +3,7 @@ import AdminPage from "./admin/page";
 
 export default function Home() {
   return (
-    <div>
+    <div className="bg-slate-100">
       <Header/>
       <AdminPage/>
     </div>
