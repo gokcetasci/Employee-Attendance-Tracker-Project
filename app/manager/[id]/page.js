@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import useStore from "@/utils/store";
-import AttendanceCalendar from "@/components/generalcalendar";
+import GeneralCalendar from "@/components/generalcalendar";
 
 function ManagerPage({ params }) {
   const managerId = parseInt(params.id);
@@ -25,7 +25,7 @@ function ManagerPage({ params }) {
         ))}
       </ul>
     
-      <AttendanceCalendar employees={managerEmployees} />
+      <GeneralCalendar employees={managerEmployees} />
     </div>
   );
 }
