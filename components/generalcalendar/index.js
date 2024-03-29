@@ -9,7 +9,12 @@ import {
   isSameDay,
 } from "date-fns";
 import { tr } from "date-fns/locale";
-import { FaEllipsisV } from "react-icons/fa";
+import {
+  FaEllipsisV,
+  FaRegArrowAltCircleLeft,
+  FaRegArrowAltCircleRight,
+} from "react-icons/fa";
+import { FcAddDatabase } from "react-icons/fc";
 import Popup from "../popup";
 
 const GeneralCalendar = ({ employees }) => {
@@ -64,12 +69,14 @@ const GeneralCalendar = ({ employees }) => {
     return (
       <div className="container mx-auto">
         <div className="flex">
-          <div className="w-1/7"></div>
+          <div className="w-[150px] h-[50px] flex justify-center items-center border">
+            <p className="text-blue-900 font-bold text-xl">Çalışanlar</p>
+          </div>
           {daysOfWeek.map((day) => (
             <div
               key={day}
-              className={`w-1/7 p-2 border text-center ${
-                isToday(day) ? "bg-gray-200" : ""
+              className={`w-[150px] h-[50px] border flex justify-center items-center  ${
+                isToday(day) ? "bg-blue-200" : ""
               }`}
               onClick={() => handleDateClick(day)}
             >
@@ -81,7 +88,7 @@ const GeneralCalendar = ({ employees }) => {
         </div>
         {employees.map((employee) => (
           <div key={employee.id} className="flex">
-            <div className="w-1/7 p-2 border text-center font-semibold">
+            <div className="w-[150px] h-[50px] p-2 border font-semibold flex items-center justify-center">
               {employee.name}
             </div>
             {daysOfWeek.map((day) => {
@@ -91,16 +98,17 @@ const GeneralCalendar = ({ employees }) => {
               return (
                 <div
                   key={`${employee.id}-${day}`}
-                  className={`w-1/7 p-2 border text-center ${
+                  className={`p-2 border flex items-center justify-center  ${
                     editable && isSameDay(day, selectedDate)
-                      ? "bg-gray-200"
+                      ? ""
                       : ""
                   }`}
+                  style={{ width: "150px", height: "50px" }}
                 >
                   {editable && isSameDay(day, selectedDate) ? (
                     <div>
-                      <FaEllipsisV
-                        className="icon"
+                      <FcAddDatabase
+                        className="w-8 h-8 cursor-pointer"
                         onClick={() => handleAttendanceChange(employee.id)}
                       />
                       {attendanceStatuses[employee.id] && (
@@ -138,38 +146,43 @@ const GeneralCalendar = ({ employees }) => {
       </div>
     );
   };
-  const initialValues = {
-    status: "Boş",
-    explanation: "",
-  };
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">
-        {format(selectedDate, "MMMM yyyy", { locale: tr })}
-      </h2>
-      <div className="mb-4">
+      <div className="mb-8 gap-5 flex items-center justify-center">
         <button
+          id="lastmonth"
           onClick={() =>
             setSelectedDate(
               new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1)
             )
           }
         >
-          Önceki Ay
+          <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
         </button>
-        <button onClick={() => setSelectedDate(new Date())}>Şuanki Ay</button>
         <button
+          id="currentmonth
+"
+          className="w-[150px]"
+          onClick={() => setSelectedDate(new Date())}
+        >
+          {" "}
+          <h2 className="text-xl font-semibold text-gray-600">
+            {format(selectedDate, "MMMM yyyy", { locale: tr })}
+          </h2>
+        </button>
+        <button
+          id="nextmonth"
           onClick={() =>
             setSelectedDate(
               new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1)
             )
           }
         >
-          Sonraki Ay
+          <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />{" "}
         </button>
       </div>
-      <div className="border p-4">
+      <div className=" shadow-xl">
         {renderCalendar()}
         {popupOpen && (
           <Popup
