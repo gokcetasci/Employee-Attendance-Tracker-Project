@@ -3,7 +3,7 @@ import { create } from "zustand";
 const useStore = create(() => {
   const admin = {
     id: 1,
-    name: "Admin",
+    name: "John Doe",
     branches: [
       {
         id: 101,
