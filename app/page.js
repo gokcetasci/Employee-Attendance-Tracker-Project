@@ -1,4 +1,4 @@
-import Header from "@/components/generalcalendar/header";
+import Header from "@/components/header";
 import AdminPage from "./admin/page";
 
 export default function Home() {
