@@ -9,14 +9,6 @@ const AdminPage = () => {
   return (
     <div className="container mx-auto ">
       <div>
-        <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
-      
-      {/* Admin bilgileri */}
-      <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">{admin.name}</h2>
-          <p>ID: {admin.id}</p>
-      </div>
-
       {/* Şubeler */}
       <div>
       <h2 className="text-xl font-semibold mb-4">Şubeler</h2>
