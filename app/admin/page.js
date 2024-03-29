@@ -2,7 +2,7 @@
 import React from "react";
 import useStore from "@/utils/store";
 import GeneralCalendar from "@/components/generalcalendar";
-
+import { FaSquare } from "react-icons/fa";
 const AdminPage = () => {
   const { admin } = useStore();
 
@@ -29,6 +29,12 @@ const AdminPage = () => {
               </div>
             ))}
           </div>
+        </div>
+        <div>
+          <p className="flex flex-row gap-2"><FaSquare className="text-green-400"/>Geldi</p>
+          <p className="flex flex-row gap-2"><FaSquare className="text-yellow-400"/>İzinli</p>
+          <p className="flex flex-row gap-2"><FaSquare className="text-red-500"/>Gelmedi</p>
+          <p className="flex flex-row gap-2"><FaSquare />Boş</p>
         </div>
       </div>
       <div className="bg-white rounded-xl p-10 shadow-2xl" >
