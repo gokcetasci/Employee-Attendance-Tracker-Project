@@ -1,8 +1,7 @@
 "use client"
-// AdminPage.jsx
 import React from 'react';
 import useStore from '@/utils/store';
-import AttendanceCalendar from '@/components/generalcalendar';
+import GeneralCalendar from '@/components/generalcalendar';
 
 const AdminPage = () => {
   const { admin } = useStore();
@@ -42,7 +41,7 @@ const AdminPage = () => {
       </div>
 
       {/* Admin takvimi */}
-      <AttendanceCalendar employees={admin.branches.flatMap(branch => branch.manager.employees)} />
+      <GeneralCalendar employees={admin.branches.flatMap(branch => branch.manager.employees)} />
     </div>
   );
 };
