@@ -10,16 +10,14 @@ import {
 } from "date-fns";
 import { tr } from "date-fns/locale";
 import { FaEllipsisV } from "react-icons/fa";
+import Popup from "../popup";
 
 const GeneralCalendar = ({ employees }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [attendanceStatuses, setAttendanceStatuses] = useState({});
   const [editable, setEditable] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-  const [explanation, setExplanation] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
-  const [selectedAttendanceStatus, setSelectedAttendanceStatus] =
-    useState("Boş");
 
   // Component yüklendiğinde varsayılan tarih için işlev çağrısı yapma
   useEffect(() => {
@@ -38,65 +36,24 @@ const GeneralCalendar = ({ employees }) => {
   };
 
   // Yoklama durumu değiştirme işlevi
-  const handleAttendanceChange = (employeeId, status) => {
+  const handleAttendanceChange = (employeeId) => {
     setSelectedEmployeeId(employeeId);
-    setSelectedAttendanceStatus(status);
     setPopupOpen(true);
   };
 
-  // Açıklama değiştirme işlevi
-  const handleExplanationChange = (event) => {
-    // Input alanının yeni değerini alın
-    const inputValue = event.target.value;
-    // Input değerini her zaman güncelleyin
-    setExplanation(inputValue);
-  };
-  
   // Kaydetme işlevi
-  const handleSave = () => {
+  const handleSave = (values) => {
     if (selectedEmployeeId !== null) {
       const updatedStatuses = { ...attendanceStatuses };
       updatedStatuses[selectedEmployeeId] = {
-        status: selectedAttendanceStatus,
-        explanation,
+        status: values.status,
+        explanation: values.explanation,
       };
       setAttendanceStatuses(updatedStatuses);
       setPopupOpen(false);
-      setSelectedAttendanceStatus("Boş");
       setSelectedEmployeeId(null);
-      setExplanation("");
     }
   };
-
-  // pop-up bileşeni
-  const Popup = ({ onClose }) => (
-    <div       className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 "
-    >
-      <div className="relative bg-white p-4 sm:p-8 rounded-md shadow-md w-[340px] sm:w-[400px] md:w-[450px]">
-        <select
-          value={selectedAttendanceStatus}
-          onChange={(e) => setSelectedAttendanceStatus(e.target.value)}
-        >
-          <option value="Boş">Boş</option>
-          <option value="Geldi">Geldi</option>
-          <option value="Gelmedi">Gelmedi</option>
-          <option value="İzinli">İzinli</option>
-        </select>
-        {selectedAttendanceStatus === "Gelmedi" && (
-          <div>
-            <input
-              type="text"
-              value={explanation}
-              onChange={handleExplanationChange}
-              placeholder="Neden gelmedi?"
-            />
-          </div>
-        )}
-        <button onClick={handleSave}>Kaydet</button>
-        <button onClick={onClose}>Kapat</button>
-      </div>
-    </div>
-  );
 
   // Takvim bileşenini oluşturma işlevi
   const renderCalendar = () => {
@@ -144,14 +101,8 @@ const GeneralCalendar = ({ employees }) => {
                     <div>
                       <FaEllipsisV
                         className="icon"
-                        onClick={() =>
-                          handleAttendanceChange(
-                            employee.id,
-                            attendanceStatuses[employee.id]
-                          )
-                        }
-                      />{" "}
-                      {/* Icon */}
+                        onClick={() => handleAttendanceChange(employee.id)}
+                      />
                       {attendanceStatuses[employee.id] && (
                         <div>
                           {attendanceStatuses[employee.id].status}
@@ -187,6 +138,10 @@ const GeneralCalendar = ({ employees }) => {
       </div>
     );
   };
+  const initialValues = {
+    status: "Boş",
+    explanation: "",
+  };
 
   return (
     <div>
@@ -216,8 +171,12 @@ const GeneralCalendar = ({ employees }) => {
       </div>
       <div className="border p-4">
         {renderCalendar()}
-        {/* Popup bileşenini render etme */}
-        {popupOpen && <Popup onClose={() => setPopupOpen(false)} />}
+        {popupOpen && (
+          <Popup
+            handleSave={handleSave}
+            handleClose={() => setPopupOpen(false)}
+          />
+        )}
       </div>
     </div>
   );
