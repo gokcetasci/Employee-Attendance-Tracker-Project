@@ -24,7 +24,7 @@ const useStore = create(() => {
               attendance: [
                 { date: "2024-02-26", status: "geldi", explanation: "" },
                 { date: "2024-03-26", status: "geldi", explanation: "" },
-                { date: "2024-03-27", status: "izinli", explanation: "" },
+                { date: "2024-03-11", status: "izinli", explanation: "" },
               ]
              },
             { id: 303, 
