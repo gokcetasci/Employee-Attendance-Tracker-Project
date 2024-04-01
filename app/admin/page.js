@@ -11,24 +11,32 @@ const AdminPage = () => {
   return (
     <div className="container mx-auto">
       <div>
-        <div className="mt-4">
+        <div className="mt-4 relative">
+        <span className="mr-2 text-xl font-medium text-gray-700">
+            Geçmiş ve gelecek tarihler için değişikliklere izin ver
+          </span>
+          <input
+            type="checkbox"
+            id="allowChangesToggle"
+            name="allowChangesToggle"
+            className="sr-only"
+            checked={allowPastAndFutureChanges}
+            onChange={(e) => setAllowPastAndFutureChanges(e.target.checked)}
+          />
           <label
             htmlFor="allowChangesToggle"
-            className="block text-sm font-medium text-gray-700"
+            className={`block w-14 h-8 bg-gray-300 rounded-full p-1 transition duration-300 ease-in-out ${
+              allowPastAndFutureChanges ? "bg-indigo-500" : ""
+            }`}
           >
-            Geçmiş ve gelecek değişikliklere izin ver
+            <div
+              className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
+                allowPastAndFutureChanges ? "translate-x-6" : ""
+              }`}
+            ></div>
           </label>
-          <div className="mt-1 flex items-center">
-            <input
-              type="checkbox"
-              id="allowChangesToggle"
-              name="allowChangesToggle"
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-              checked={allowPastAndFutureChanges}
-              onChange={(e) => setAllowPastAndFutureChanges(e.target.checked)}
-            />
-          </div>
         </div>
+
         {/* Şubeler */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Şubeler</h2>
