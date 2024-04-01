@@ -1,10 +1,8 @@
 "use client";
-// AdminPage.js
 import React, { useState } from "react";
 import useStore from "@/utils/store";
 import GeneralCalendar from "@/components/generalcalendar";
-import { FaSquare } from "react-icons/fa";
-import PersonalCalendar from "@/components/personalcalendar";
+
 
 const AdminPage = () => {
   const { admin } = useStore();
