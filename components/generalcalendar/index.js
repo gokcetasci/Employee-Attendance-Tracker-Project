@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import useStore from "@/utils/store";
 import Popup from "../popup";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaEdit } from "react-icons/fa";
 import Link from "next/link";
 import {
   FaRegArrowAltCircleLeft,
@@ -115,14 +115,19 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-between w-full mb-4">
-        <button onClick={goToPreviousWeek}><FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" /></button>
+        <button onClick={goToPreviousWeek}>
+          <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
+        </button>
         <h2 className="text-xl font-semibold text-gray-600">
           {currentDate.toLocaleDateString("tr-TR", {
             year: "numeric",
             month: "long",
           })}
         </h2>
-        <button onClick={goToNextWeek}> <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" /></button>
+        <button onClick={goToNextWeek}>
+          {" "}
+          <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
+        </button>
       </div>
 
       <table className="border-collapse border border-gray-300">
@@ -130,7 +135,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
           <tr>
             <th className="border border-gray-300"></th>
             {getWeekDates(currentDate).map((date, index) => (
-              <th key={index} className="border border-gray-300 px-4 py-2 text-center">
+              <th key={index} className="border border-gray-300 px-4 py-2">
                 <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
                 <p>{date.toLocaleDateString("tr-TR")}</p>
               </th>
@@ -140,43 +145,52 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         <tbody>
           {admin.branches.flatMap((branch) => branch.manager.employees).map((employee) => (
             <tr key={employee.id}>
-              <td className="border border-gray-300 px-4 py-2"><Link href={`/employee/${employee.id}`}>{employee.name}</Link></td>
-              {getWeekDates(currentDate).map((date, index) => (
-                <td key={index} className="border border-gray-300 px-4 py-2 text-center" onClick={() =>
-                  allowPastAndFutureChanges
-                    ? openPopup(employee.id, date)
-                    : date.toDateString() === new Date().toDateString()
-                    ? openPopup(employee.id, date)
-                    : null
-                }>
-                  <p>
-                    {getAttendanceStatus(
-                      employee.id,
-                      date.toISOString().split("T")[0]
-                    )}
-                  </p>
-                  {getAttendanceStatus(
-                    employee.id,
-                    date.toISOString().split("T")[0]
-                  ) === "Gelmedi" &&
-                    getExplanation(
-                      employee.id,
-                      date.toISOString().split("T")[0]
-                    ) && (
-                      <FaInfoCircle
-                        onClick={() =>
-                          alert(
-                            getExplanation(
-                              employee.id,
-                              date.toISOString().split("T")[0]
-                            )
-                          )
-                        }
-                        style={{ cursor: "pointer" }}
-                      />
-                    )}
-                </td>
-              ))}
+              <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center "><Link href={`/employee/${employee.id}`}>{employee.name}</Link></td>
+              {getWeekDates(currentDate).map((date, index) => {
+                const isClickable =
+                  allowPastAndFutureChanges ||
+                  date.toDateString() === new Date().toDateString();
+                return (
+                  <td key={index} className="w-[150px] h-[50px]  border border-gray-300 px-4 py-2">
+                    <div className="flex flex-row gap-2  items-center justify-center">
+                      <p>
+                        {getAttendanceStatus(
+                          employee.id,
+                          date.toISOString().split("T")[0]
+                        )}
+                      </p>
+                      {isClickable && (
+                        <FaEdit
+                          onClick={() =>
+                            openPopup(employee.id, date)
+                          }
+                          className="cursor-pointer"
+                        />
+                      )}
+                      {getAttendanceStatus(
+                        employee.id,
+                        date.toISOString().split("T")[0]
+                      ) === "Gelmedi" &&
+                        getExplanation(
+                          employee.id,
+                          date.toISOString().split("T")[0]
+                        ) && (
+                          <FaInfoCircle
+                            onClick={() =>
+                              alert(
+                                getExplanation(
+                                  employee.id,
+                                  date.toISOString().split("T")[0]
+                                )
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          />
+                        )}
+                    </div>
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
