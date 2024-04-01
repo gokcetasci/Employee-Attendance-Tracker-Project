@@ -8,6 +8,7 @@ import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
 } from "react-icons/fa";
+
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { admin } = useStore.getState();
@@ -124,12 +125,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         <button onClick={goToNextWeek}> <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" /></button>
       </div>
 
-      <table>
+      <table className="border-collapse border border-gray-300">
         <thead>
           <tr>
-            <th></th>
+            <th className="border border-gray-300"></th>
             {getWeekDates(currentDate).map((date, index) => (
-              <th key={index}>
+              <th key={index} className="border border-gray-300 px-4 py-2 text-center">
                 <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
                 <p>{date.toLocaleDateString("tr-TR")}</p>
               </th>
@@ -139,9 +140,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         <tbody>
           {admin.branches.flatMap((branch) => branch.manager.employees).map((employee) => (
             <tr key={employee.id}>
-              <td><Link href={`/employee/${employee.id}`}>{employee.name}</Link></td>
+              <td className="border border-gray-300 px-4 py-2"><Link href={`/employee/${employee.id}`}>{employee.name}</Link></td>
               {getWeekDates(currentDate).map((date, index) => (
-                <td key={index} onClick={() =>
+                <td key={index} className="border border-gray-300 px-4 py-2 text-center" onClick={() =>
                   allowPastAndFutureChanges
                     ? openPopup(employee.id, date)
                     : date.toDateString() === new Date().toDateString()
