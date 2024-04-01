@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { FcInfo } from "react-icons/fc";
 
 function PersonalCalendar({ employee }) {
   const { attendance } = employee;
@@ -10,22 +11,25 @@ function PersonalCalendar({ employee }) {
   const changeMonth = (increment) => {
     setMonth((prevMonth) => {
       let newMonth = prevMonth + increment;
+      let newYear = year;
       // Eğer yeni ay 1'den küçükse, Aralık ayına döndür ve yılı bir önceki yıla ayarla
       if (newMonth < 1) {
         newMonth = 12;
-        setYear((prevYear) => prevYear - 1);
+        newYear -= 1;
       }
       // Eğer yeni ay 12'den büyükse, Ocak ayına döndür ve yılı bir sonraki yıla ayarla
       else if (newMonth > 12) {
         newMonth = 1;
-        setYear((prevYear) => prevYear + 1);
+        newYear += 1;
       }
+      setYear(newYear); // Yılı güncelle
       return newMonth;
     });
   };
 
   // Seçilen aydaki gün sayısını hesapla
   const daysInMonth = new Date(year, month, 0).getDate();
+  const firstDayOfMonth = new Date(year, month - 1, 1).getDay(); // Ayın ilk gününün haftanın hangi günü olduğunu al
 
   // Ay isimlerini Türkçe olarak ayarla
   const turkishMonthNames = [
@@ -42,6 +46,9 @@ function PersonalCalendar({ employee }) {
     "Kasım",
     "Aralık",
   ];
+
+  // Haftanın günlerini Türkçe olarak ayarla (Gerçek takvime uygun olarak)
+  const turkishDayNames = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
 
   return (
     <div className="m-12 shadow-md bg-white rounded-md p-5">
@@ -65,18 +72,17 @@ function PersonalCalendar({ employee }) {
       </div>
       {/* Haftanın günlerini gösteren satır */}
       <div className="grid grid-cols-7 gap-1">
-        {["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"].map((day) => (
-          <div key={day} className="text-center font-bold text-gray-800">
+        {turkishDayNames.map((day, index) => (
+          <div key={index} className="text-center font-bold text-gray-800">
             {day}
           </div>
         ))}
         {/* Takvim günlerini gösteren satırlar */}
-        {[...Array(daysInMonth)].map((_, index) => {
-          const currentDate = new Date(year, month - 1, index + 1)
-            .toISOString()
-            .split("T")[0];
+        {[...Array(daysInMonth + firstDayOfMonth)].map((_, index) => {
+          const dayOfMonth = index - firstDayOfMonth + 1; // Ayın ilk gününden başlayarak günleri ayarla
+          const currentDate = new Date(year, month - 1, dayOfMonth);
           const currentRecord = attendance.find(
-            (record) => record.date === currentDate
+            (record) => record.date === currentDate.toISOString().split("T")[0]
           );
           let backgroundColor;
           if (currentRecord) {
@@ -96,13 +102,22 @@ function PersonalCalendar({ employee }) {
           return (
             <div
               key={index}
-              className="text-center border border-indigo-200 p-2"
+              className="text-center border border-indigo-200 p-2 relative"
               style={{ backgroundColor }}
             >
-              <div className="text-gray-500">{index + 1}</div>
-              <div className="text-md mt-1 font-medium ">
+              <div className="text-gray-500">{dayOfMonth > 0 ? dayOfMonth : ""}</div>
+              <div className="text-md mt-1 font-medium">
                 {currentRecord ? currentRecord.status : "-"}
               </div>
+              {currentRecord && currentRecord.status === "gelmedi" && (
+                <div className="absolute top-0 right-0">
+                  <FcInfo
+                    className="text-gray-600 cursor-pointer"
+                    size={20}
+                    title={currentRecord.explanation} 
+                  />
+                </div>
+              )}
             </div>
           );
         })}

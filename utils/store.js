@@ -15,15 +15,16 @@ const useStore = create(() => {
             { id: 301, 
               name: "Employee 1", 
               attendance: [
+                { date: "2024-03-12", status: "izinli", explanation: "" },
                 { date: "2024-03-23", status: "izinli", explanation: "" },
-              { date: "2024-03-26", status: "gelmedi", explanation: "" },
+              { date: "2024-03-26", status: "gelmedi", explanation: "saha araştırması için göreve gitti" },
               { date: "2024-03-27", status: "geldi", explanation: "" },
             ] },
             { id: 302, 
               name: "Employee 2",
               attendance: [
                 { date: "2024-02-25", status: "geldi", explanation: "" },
-                { date: "2024-03-26", status: "geldi", explanation: "" },
+                { date: "2024-03-26", status: "gelmedi", explanation: "" },
                 { date: "2024-03-11", status: "izinli", explanation: "" },
               ]
              },
