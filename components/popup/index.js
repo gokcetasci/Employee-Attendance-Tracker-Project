@@ -1,3 +1,4 @@
+// Popup.js
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
@@ -17,8 +18,8 @@ const validate = (values) => {
   return errors;
 };
 
-const Popup = ({ handleSave, handleClose }) => (
-  <Formik initialValues={initialValues} validate={validate} onSubmit={handleSave}>
+const Popup = ({ handleSave, handleClose, employeeId, date }) => (
+  <Formik initialValues={initialValues} validate={validate} onSubmit={(values) => handleSave(employeeId, date, values)}>
     {({ values }) => (
       <Form>
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -30,7 +31,7 @@ const Popup = ({ handleSave, handleClose }) => (
               <option value="İzinli">İzinli</option>
             </Field>
             <ErrorMessage name="status" component="div" className="text-red-500" />
-            {values.status === "Gelmedi" && ( // Sadece "Gelmedi" seçeneği seçildiğinde görünsün
+            {values.status === "Gelmedi" && (
               <>
                 <Field type="text" name="explanation" placeholder="Neden gelmedi?" />
                 <ErrorMessage name="explanation" component="div" className="text-red-500" />
@@ -44,7 +45,5 @@ const Popup = ({ handleSave, handleClose }) => (
     )}
   </Formik>
 );
-
-
 
 export default Popup;

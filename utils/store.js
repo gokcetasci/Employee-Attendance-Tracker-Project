@@ -22,7 +22,7 @@ const useStore = create(() => {
             { id: 302, 
               name: "Employee 2",
               attendance: [
-                { date: "2024-02-26", status: "geldi", explanation: "" },
+                { date: "2024-02-25", status: "geldi", explanation: "" },
                 { date: "2024-03-26", status: "geldi", explanation: "" },
                 { date: "2024-03-11", status: "izinli", explanation: "" },
               ]

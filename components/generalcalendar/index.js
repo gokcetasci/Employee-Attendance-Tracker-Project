@@ -1,196 +1,194 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import useStore from "@/utils/store";
+import Popup from "../popup";
+import { FaInfoCircle } from "react-icons/fa";
+import Link from "next/link";
 import {
-  format,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  isToday,
-  isSameDay,
-} from "date-fns";
-import { tr } from "date-fns/locale";
-import {
-  FaEllipsisV,
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
 } from "react-icons/fa";
-import { FcAddDatabase } from "react-icons/fc";
-import Popup from "../popup";
-
-const GeneralCalendar = ({ employees }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [attendanceStatuses, setAttendanceStatuses] = useState({});
-  const [editable, setEditable] = useState(false);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const { admin } = useStore.getState();
   const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  // Component yüklendiğinde varsayılan tarih için işlev çağrısı yapma
-  useEffect(() => {
-    handleDateClick(new Date());
-  }, []);
-
-  // Tarih değiştirme işlevi
-  const handleDateClick = (date) => {
-    const today = new Date();
-    if (isSameDay(date, today)) {
-      setEditable(true);
-      setSelectedDate(date);
-    } else {
-      setEditable(false);
+  const handleSaveAttendance = (employeeId, date, values) => {
+    const updatedAdmin = { ...admin };
+    const employee = updatedAdmin.branches
+      .flatMap((branch) => branch.manager.employees)
+      .find((employee) => employee.id === employeeId);
+    if (employee) {
+      const attendanceIndex = employee.attendance.findIndex(
+        (a) => a.date === date.toISOString().split("T")[0]
+      );
+      if (attendanceIndex !== -1) {
+        updatedAdmin.branches.forEach((branch) => {
+          branch.manager.employees.forEach((emp) => {
+            if (emp.id === employeeId) {
+              const attendance = emp.attendance.find(
+                (a) => a.date === date.toISOString().split("T")[0]
+              );
+              if (attendance) {
+                attendance.status = values.status;
+                if (values.status === "Gelmedi") {
+                  attendance.explanation = values.explanation;
+                } else {
+                  delete attendance.explanation;
+                }
+              }
+            }
+          });
+        });
+      } else {
+        employee.attendance.push({
+          date: date.toISOString().split("T")[0],
+          status: values.status,
+          explanation:
+            values.status === "Gelmedi" ? values.explanation : undefined,
+        });
+      }
+      useStore.setState({ admin: updatedAdmin });
     }
+    setPopupOpen(false);
   };
 
-  // Yoklama durumu değiştirme işlevi
-  const handleAttendanceChange = (employeeId) => {
-    setSelectedEmployeeId(employeeId);
+  const getAttendanceStatus = (employeeId, date) => {
+    const employee = admin.branches
+      .flatMap((branch) => branch.manager.employees)
+      .find((employee) => employee.id === employeeId);
+    if (employee) {
+      const attendance = employee.attendance.find((a) => a.date === date);
+      return attendance ? attendance.status : "Bilgi yok";
+    }
+    return "Bilgi yok";
+  };
+
+  const getExplanation = (employeeId, date) => {
+    const employee = admin.branches
+      .flatMap((branch) => branch.manager.employees)
+      .find((employee) => employee.id === employeeId);
+    if (employee) {
+      const attendance = employee.attendance.find((a) => a.date === date);
+      return attendance && attendance.explanation ? attendance.explanation : "";
+    }
+    return "";
+  };
+
+  const getWeekDates = (date) => {
+    const weekDates = [];
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1);
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      weekDates.push(day);
+    }
+    return weekDates;
+  };
+
+  const goToPreviousWeek = () => {
+    const previousWeek = new Date(currentDate);
+    previousWeek.setDate(previousWeek.getDate() - 7);
+    setCurrentDate(previousWeek);
+  };
+
+  const goToNextWeek = () => {
+    const nextWeek = new Date(currentDate);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    setCurrentDate(nextWeek);
+  };
+
+  const openPopup = (employeeId, date) => {
+    setSelectedEmployee(employeeId);
+    setSelectedDate(date);
     setPopupOpen(true);
   };
 
-  // Kaydetme işlevi
-  const handleSave = (values) => {
-    if (selectedEmployeeId !== null) {
-      const updatedStatuses = { ...attendanceStatuses };
-      updatedStatuses[selectedEmployeeId] = {
-        status: values.status,
-        explanation: values.explanation,
-      };
-      setAttendanceStatuses(updatedStatuses);
-      setPopupOpen(false);
-      setSelectedEmployeeId(null);
-    }
-  };
-
-  // Takvim bileşenini oluşturma işlevi
-  const renderCalendar = () => {
-    const weekStart = startOfWeek(selectedDate);
-    const weekEnd = endOfWeek(selectedDate);
-    const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
-
-    return (
-      <div className="container mx-auto">
-        <div className="flex">
-          <div className="w-[150px] h-[50px] flex justify-center items-center border">
-            <p className="text-blue-900 font-bold text-xl">Çalışanlar</p>
-          </div>
-          {daysOfWeek.map((day) => (
-            <div
-              key={day}
-              className={`w-[150px] h-[50px] border flex justify-center items-center  ${
-                isToday(day) ? "bg-blue-200" : ""
-              }`}
-              onClick={() => handleDateClick(day)}
-            >
-              <div className="font-semibold mb-1">
-                {format(day, "d", { locale: tr })}
-              </div>
-            </div>
-          ))}
-        </div>
-        {employees.map((employee) => (
-          <div key={employee.id} className="flex">
-            <div className="w-[150px] h-[50px] p-2 border font-semibold flex items-center justify-center">
-              {employee.name}
-            </div>
-            {daysOfWeek.map((day) => {
-              const attendanceData = employee.attendance.find(
-                (att) => att.date === format(day, "yyyy-MM-dd")
-              );
-              return (
-                <div
-                  key={`${employee.id}-${day}`}
-                  className={`p-2 border flex items-center justify-center  ${
-                    editable && isSameDay(day, selectedDate)
-                      ? ""
-                      : ""
-                  }`}
-                  style={{ width: "150px", height: "50px" }}
-                >
-                  {editable && isSameDay(day, selectedDate) ? (
-                    <div>
-                      <FcAddDatabase
-                        className="w-8 h-8 cursor-pointer"
-                        onClick={() => handleAttendanceChange(employee.id)}
-                      />
-                      {attendanceStatuses[employee.id] && (
-                        <div>
-                          {attendanceStatuses[employee.id].status}
-                          {attendanceStatuses[employee.id].status ===
-                            "Gelmedi" && (
-                            <span>
-                              {" "}
-                              - {attendanceStatuses[employee.id].explanation}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      {attendanceData ? (
-                        <div>
-                          <span>{attendanceData.status}</span>
-                          {attendanceData.explanation && (
-                            <span> - {attendanceData.explanation}</span>
-                          )}
-                        </div>
-                      ) : (
-                        <div>---</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    );
+  const closePopup = () => {
+    setPopupOpen(false);
   };
 
   return (
-    <div>
-      <div className="mb-8 gap-5 flex items-center justify-center">
-        <button
-          id="lastmonth"
-          onClick={() =>
-            setSelectedDate(
-              new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1)
-            )
-          }
-        >
-          <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
-        </button>
-        <button
-          id="currentmonth
-"
-          className="w-[150px]"
-          onClick={() => setSelectedDate(new Date())}
-        >
-          {" "}
-          <h2 className="text-xl font-semibold text-gray-600">
-            {format(selectedDate, "MMMM yyyy", { locale: tr })}
-          </h2>
-        </button>
-        <button
-          id="nextmonth"
-          onClick={() =>
-            setSelectedDate(
-              new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1)
-            )
-          }
-        >
-          <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />{" "}
-        </button>
+    <div className="flex flex-col items-center">
+      <div className="flex justify-between w-full mb-4">
+        <button onClick={goToPreviousWeek}><FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" /></button>
+        <h2 className="text-xl font-semibold text-gray-600">
+          {currentDate.toLocaleDateString("tr-TR", {
+            year: "numeric",
+            month: "long",
+          })}
+        </h2>
+        <button onClick={goToNextWeek}> <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" /></button>
       </div>
-      <div className=" shadow-xl">
-        {renderCalendar()}
-        {popupOpen && (
-          <Popup
-            handleSave={handleSave}
-            handleClose={() => setPopupOpen(false)}
-          />
-        )}
-      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            {getWeekDates(currentDate).map((date, index) => (
+              <th key={index}>
+                <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
+                <p>{date.toLocaleDateString("tr-TR")}</p>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {admin.branches.flatMap((branch) => branch.manager.employees).map((employee) => (
+            <tr key={employee.id}>
+              <td><Link href={`/employee/${employee.id}`}>{employee.name}</Link></td>
+              {getWeekDates(currentDate).map((date, index) => (
+                <td key={index} onClick={() =>
+                  allowPastAndFutureChanges
+                    ? openPopup(employee.id, date)
+                    : date.toDateString() === new Date().toDateString()
+                    ? openPopup(employee.id, date)
+                    : null
+                }>
+                  <p>
+                    {getAttendanceStatus(
+                      employee.id,
+                      date.toISOString().split("T")[0]
+                    )}
+                  </p>
+                  {getAttendanceStatus(
+                    employee.id,
+                    date.toISOString().split("T")[0]
+                  ) === "Gelmedi" &&
+                    getExplanation(
+                      employee.id,
+                      date.toISOString().split("T")[0]
+                    ) && (
+                      <FaInfoCircle
+                        onClick={() =>
+                          alert(
+                            getExplanation(
+                              employee.id,
+                              date.toISOString().split("T")[0]
+                            )
+                          )
+                        }
+                        style={{ cursor: "pointer" }}
+                      />
+                    )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      {popupOpen && (
+        <Popup
+          handleSave={handleSaveAttendance}
+          handleClose={closePopup}
+          employeeId={selectedEmployee}
+          date={selectedDate}
+        />
+      )}
     </div>
   );
 };
