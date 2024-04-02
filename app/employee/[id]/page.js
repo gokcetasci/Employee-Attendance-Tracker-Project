@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import useStore from "@/utils/store";
-import PersonalCalendar from "@/components/personalcalendar"; // PersonalCalendar bileşenini import ediyoruz
+import PersonalCalendar from "@/components/personalcalendar";
 import { FcAssistant } from "react-icons/fc";
 
 function EmployeePage({ params }) {
@@ -19,8 +19,11 @@ function EmployeePage({ params }) {
     branch.manager.employees.some((emp) => emp.id === employeeId)
   );
 
+  // Employee'nin katılım bilgilerini al
+  const attendanceData = employee.attendance;
+
   return (
-    <div className=" w-full h-screen bg-slate-50">
+    <div className="w-full h-screen bg-slate-50">
       <div className="px-12 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
         <div className="flex flex-row items-center justify-center gap-4">
           <FcAssistant className="w-10 p-1 h-10 rounded-full border border-1 border-gray-500 bg-white" />
@@ -28,7 +31,8 @@ function EmployeePage({ params }) {
         </div>
         <div className="flex flex-row gap-7">
           <p className="text-indigo-800">
-            <span className="text-blue-800 font-bold">Şube:</span> {branch.name}
+            <span className="text-blue-800 font-bold">Şube:</span>{" "}
+            {branch.name}
           </p>
           <p className="text-indigo-800">
             <span className="text-blue-800 font-bold">Müdür:</span>{" "}
@@ -36,9 +40,25 @@ function EmployeePage({ params }) {
           </p>
         </div>
       </div>
-
+     
       {/* PersonalCalendar bileşenini çağırıyoruz ve ilgili işçinin bilgilerini aktarıyoruz */}
       <PersonalCalendar employee={employee} />
+
+       {/* Katılım bilgilerini göster */}
+       <div className="px-12 py-3">
+        <h3 className="text-lg font-bold text-blue-800">Katılım Bilgileri:</h3>
+        <ul className="list-disc list-inside">
+          {attendanceData.map((attendance, index) => (
+            <li key={index}>
+              {attendance.date} - {attendance.status}
+              {attendance.explanation && (
+                <span> ({attendance.explanation})</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
     </div>
   );
 }
