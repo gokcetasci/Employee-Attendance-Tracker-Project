@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import useStore from "@/utils/store";
 import Popup from "../popup";
 import Link from "next/link";
-import { Formik, Form, Field } from "formik"; // Formik eklenmeli
+import { Formik, Form, Field } from "formik";
 import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
 } from "react-icons/fa";
-import { FcInfo, FcAddDatabase } from "react-icons/fc";
+import { FcInfo, FcViewDetails } from "react-icons/fc";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -16,8 +16,11 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectAll, setSelectAll] = useState(false); // State for select all checkbox
+  const [selectedEmployees, setSelectedEmployees] = useState({}); // State to track selected employees
 
-  // Katılım kaydetme işlevi
+  // Yoklama kaydetme işlevi
   const handleSaveAttendance = (employeeId, date, values) => {
     const updatedAdmin = { ...admin };
     const employee = updatedAdmin.branches
@@ -118,9 +121,33 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     setPopupOpen(false);
   };
 
+  // Belirli bir çalışan için seçim durumunu değiştir
+  const toggleEmployeeSelect = (employeeId) => {
+    setSelectedEmployees((prevState) => ({
+      ...prevState,
+      [employeeId]: !prevState[employeeId],
+    }));
+  };
+
+  // Tümünü seç onay kutusunu değiştir
+  const toggleSelectAll = () => {
+    const allSelected = Object.values(selectedEmployees).every(
+      (selected) => selected
+    );
+    setSelectedEmployees((prevState) => {
+      const newState = {};
+      for (const employee of admin.branches.flatMap(
+        (branch) => branch.manager.employees
+      )) {
+        newState[employee.id] = !allSelected;
+      }
+      return newState;
+    });
+  };
+
   return (
     <div className="flex flex-col items-center">
-      <div className="flex justify-between w-full mb-4">
+      <div className="flex justify-evenly w-full mb-4">
         <button onClick={goToPreviousWeek}>
           <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
         </button>
@@ -139,9 +166,22 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       <table className="border-collapse border border-gray-300">
         <thead>
           <tr>
+            {" "}
+            <th className="border border-gray-300">
+              <input
+                type="checkbox"
+                onChange={toggleSelectAll}
+                checked={Object.values(selectedEmployees).every(
+                  (selected) => selected
+                )}
+              />
+            </th>
             <th className="border border-gray-300"></th>
             {getWeekDates(currentDate).map((date, index) => (
-              <th key={index} className="border border-gray-300 px-4 py-2">
+              <th
+                key={index}
+                className="border border-gray-300 px-4 py-2  text-gray-600 text-sm"
+              >
                 <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
                 <p>{date.toLocaleDateString("tr-TR")}</p>
               </th>
@@ -153,7 +193,14 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             .flatMap((branch) => branch.manager.employees)
             .map((employee) => (
               <tr key={employee.id}>
-                <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center ">
+                <td className="px-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedEmployees[employee.id]}
+                    onChange={() => toggleEmployeeSelect(employee.id)}
+                  />
+                </td>
+                <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
                   <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
                 </td>
                 {getWeekDates(currentDate).map((date, index) => {
@@ -172,9 +219,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                   return (
                     <td
                       key={index}
-                      className="w-[150px] h-[50px]  border border-gray-300 px-4 py-2"
+                      className="w-[150px] h-[50px] border border-gray-300 px-4 py-2"
                     >
-                      <div className="flex flex-row gap-2  items-center justify-center">
+                      <div className="flex flex-row gap-2 items-center justify-center">
                         <p>{attendanceStatus}</p>
                         {explanation && (
                           <div className="relative">
@@ -187,30 +234,81 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                         )}
                         {isClickable && (
                           <Formik
-                            initialValues={{ status: '', explanation: '' }}
+                            initialValues={{ status: "", explanation: "" }}
                             onSubmit={(values) => {
                               handleSaveAttendance(employee.id, date, values);
                             }}
                           >
-                            <Form className="flex gap-4">
-                              <Field type="checkbox" name="status" value="Geldi" /> Geldi
-                              <Field type="checkbox" name="status" value="Gelmedi" /> Gelmedi
-                              <Field type="checkbox" name="status" value="İzinli" /> İzinli
-                              <Field type="text" name="explanation" placeholder="Açıklama" />
-                            </Form>
+                            {({ values, setFieldValue }) => (
+                              <Form className="flex flex-row gap-2 text-sm">
+                                <Field
+                                  className="rounded-sm border border-indigo-400 text-gray-700 outline-none hover:border-indigo-600 p-1"
+                                  as="select"
+                                  name="status"
+                                  onChange={(e) => {
+                                    setFieldValue("status", e.target.value);
+                                    if (e.target.value === "Gelmedi") {
+                                      setFieldValue("explanationVisible", true);
+                                    } else {
+                                      setFieldValue(
+                                        "explanationVisible",
+                                        false
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <option value="">Durum Seçin</option>
+                                  <option value="Geldi">Geldi</option>
+                                  <option value="Gelmedi">Gelmedi</option>
+                                  <option value="İzinli">İzinli</option>
+                                </Field>
+
+                                {values.explanationVisible && (
+                                  <div className="flex items-center relative">
+                                    <FcViewDetails
+                                      onClick={() =>
+                                        setDropdownVisible((prevState) => ({
+                                          ...prevState,
+                                          [employee.id]:
+                                            !prevState[employee.id],
+                                        }))
+                                      }
+                                      className="text-gray-600 cursor-pointer w-6 h-6 hover:scale-105"
+                                      size={20}
+                                    />
+                                    <div className="dropdown-menu absolute top-0 left-10 z-10">
+                                      {dropdownVisible[employee.id] && (
+                                        <div className="bg-slate-50 p-4 border border-gray-300 shadow-2xl rounded-md">
+                                          <Field
+                                            className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
+                                            type="text"
+                                            name="explanation"
+                                            placeholder="Neden Gelmedi?"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </Form>
+                            )}
                           </Formik>
                         )}
                       </div>
                     </td>
                   );
                 })}
-             
               </tr>
             ))}
-              
         </tbody>
       </table>
-      <button className="bg-teal-500 text-white px-4 py-2 rounded-full mt-5" type="submit">Kaydet</button>
+
+      <button
+        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+        type="submit"
+      >
+        KAYDET
+      </button>
 
       {popupOpen && (
         <Popup
