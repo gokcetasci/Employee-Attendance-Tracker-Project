@@ -6,8 +6,11 @@ import Link from "next/link";
 import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
+  FaRegCheckCircle,
+  FaRegTimesCircle,
+  FaRegCalendarAlt,
 } from "react-icons/fa";
-import { FcInfo,FcAddDatabase } from "react-icons/fc";
+import { FcInfo } from "react-icons/fc";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -15,8 +18,8 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [attendanceValues, setAttendanceValues] = useState({});
 
-  // Katılım kaydetme işlevi
   const handleSaveAttendance = (employeeId, date, values) => {
     const updatedAdmin = { ...admin };   
     const employee = updatedAdmin.branches
@@ -26,7 +29,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       const attendanceIndex = employee.attendance.findIndex(
         (a) => a.date === date.toISOString().split("T")[0]
       );        
-      if (attendanceIndex !== -1) {  // Eğer katılım bulunursa, durumu ve açıklamayı güncelleyin
+      if (attendanceIndex !== -1) {  
         updatedAdmin.branches.forEach((branch) => {
           branch.manager.employees.forEach((emp) => {
             if (emp.id === employeeId) {
@@ -41,7 +44,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             }
           });
         });
-      } else { // Eğer katılım bulunmazsa, yeni bir katılım ekle
+      } else { 
         employee.attendance.push({
           date: date.toISOString().split("T")[0],
           status: values.status,
@@ -53,20 +56,17 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     setPopupOpen(false);
   };
 
-  // Çalışanın belirli bir tarihte yoklama bilgisini alma
+  const getAttendanceStatus = (employeeId, date) => {
+    const employee = admin.branches
+      .flatMap((branch) => branch.manager.employees)
+      .find((employee) => employee.id === employeeId);
+    if (employee) {
+      const attendance = employee.attendance.find((a) => a.date === date);
+      return attendance && attendance.status !== null ? attendance.status : "";
+    }
+    return "Bilgi yok";
+  };
 
-const getAttendanceStatus = (employeeId, date) => {
-  const employee = admin.branches
-    .flatMap((branch) => branch.manager.employees)
-    .find((employee) => employee.id === employeeId);
-  if (employee) {
-    const attendance = employee.attendance.find((a) => a.date === date);
-    return attendance && attendance.status !== null ? attendance.status : "";
-  }
-  return "Bilgi yok";
-};
-
-  // Çalışanın explanation bilgisini alma
   const getExplanation = (employeeId, date) => {
     const employee = admin.branches
       .flatMap((branch) => branch.manager.employees)
@@ -78,7 +78,6 @@ const getAttendanceStatus = (employeeId, date) => {
     return "";
   };
 
-  // Haftanın tarihlerini alma
   const getWeekDates = (date) => {
     const weekDates = [];
     const startOfWeek = new Date(date);
@@ -91,32 +90,34 @@ const getAttendanceStatus = (employeeId, date) => {
     return weekDates;
   };
 
-  // Önceki haftaya gitme işlevi
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
     previousWeek.setDate(previousWeek.getDate() - 7);
     setCurrentDate(previousWeek);
   };
 
-  // Sonraki haftaya gitme işlevi
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
     nextWeek.setDate(nextWeek.getDate() + 7);
     setCurrentDate(nextWeek);
   };
 
-  // Açılır pencereyi açma işlevi
   const openPopup = (employeeId, date) => {
     setSelectedEmployee(employeeId);
     setSelectedDate(date);
     setPopupOpen(true);
   };
 
-  // Açılır pencereyi kapatma işlevi
   const closePopup = () => {
     setPopupOpen(false);
   };
-
+  const handleAttendanceSelection = (employeeId, date, status) => {
+    setAttendanceValues(prevValues => ({
+      ...prevValues,
+      [`${employeeId}-${date}`]: status,
+    }));
+  };
+  
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-between w-full mb-4">
@@ -153,6 +154,7 @@ const getAttendanceStatus = (employeeId, date) => {
             .map((employee) => (
               <tr key={employee.id}>
                 <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center ">
+                  
                   <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
                 </td>
                 {getWeekDates(currentDate).map((date, index) => {
@@ -173,8 +175,31 @@ const getAttendanceStatus = (employeeId, date) => {
                       key={index}
                       className="w-[150px] h-[50px]  border border-gray-300 px-4 py-2"
                     >
-                      <div className="flex flex-row gap-2  items-center justify-center">
-                        <p>{attendanceStatus}</p>{explanation && ( // Eğer açıklama varsa, bu koşulu kontrol edin
+                      <div className="flex flex-row gap-2 items-center justify-center">
+                        {isClickable && (
+                          <div className="flex gap-2 items-center justify-center">
+                            <FaRegCheckCircle
+                              className={`cursor-pointer ${
+                                attendanceValues[`${employee.id}-${date.toISOString().split("T")[0]}`] === "Geldi" ? "text-green-500" : "text-gray-500"
+                              }`}
+                              onClick={() => handleAttendanceSelection(employee.id, date.toISOString().split("T")[0], "Geldi")}
+                            />
+                            <FaRegTimesCircle
+                              className={`cursor-pointer ${
+                                attendanceValues[`${employee.id}-${date.toISOString().split("T")[0]}`] === "Gelmedi" ? "text-red-500" : "text-gray-500"
+                              }`}
+                              onClick={() => handleAttendanceSelection(employee.id, date.toISOString().split("T")[0], "Gelmedi")}
+                            />
+                            <FaRegCalendarAlt
+                              className={`cursor-pointer ${
+                                attendanceValues[`${employee.id}-${date.toISOString().split("T")[0]}`] === "İzinli" ? "text-blue-500" : "text-gray-500"
+                              }`}
+                              onClick={() => handleAttendanceSelection(employee.id, date.toISOString().split("T")[0], "İzinli")}
+                            />
+                          </div>
+                        )}
+                        <p>{attendanceStatus}</p>
+                        {explanation && (
                           <div className="relative">
                             <FcInfo
                               className="text-gray-600 cursor-pointer"
@@ -183,13 +208,6 @@ const getAttendanceStatus = (employeeId, date) => {
                             />
                           </div>
                         )}
-                        {isClickable && (
-                          <FcAddDatabase
-                            onClick={() => openPopup(employee.id, date)}
-                            className="cursor-pointer"
-                          />
-                        )}
-                        
                       </div>
                     </td>
                   );
