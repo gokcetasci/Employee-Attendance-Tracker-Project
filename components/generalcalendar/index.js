@@ -1,24 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useStore from "@/utils/store";
-import Popup from "../popup";
 import Link from "next/link";
 import { Formik, Form, Field } from "formik";
-import {
-  FaRegArrowAltCircleLeft,
-  FaRegArrowAltCircleRight,
+import { FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight,
 } from "react-icons/fa";
 import { FcInfo, FcViewDetails } from "react-icons/fc";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
   const { admin } = useStore.getState();
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedEmployees, setSelectedEmployees] = useState({});
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [selectAll, setSelectAll] = useState(false); // State for select all checkbox
-  const [selectedEmployees, setSelectedEmployees] = useState({}); // State to track selected employees
+  const [popupEmployeeNames, setPopupEmployeeNames] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isAttendanceButtonDisabled, setIsAttendanceButtonDisabled] =
+    useState(true);
 
   // Yoklama kaydetme işlevi
   const handleSaveAttendance = (employeeId, date, values) => {
@@ -54,11 +51,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       }
       useStore.setState({ admin: updatedAdmin });
     }
-    setPopupOpen(false);
   };
 
   // Çalışanın belirli bir tarihte yoklama bilgisini alma
-
   const getAttendanceStatus = (employeeId, date) => {
     const employee = admin.branches
       .flatMap((branch) => branch.manager.employees)
@@ -109,18 +104,6 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     setCurrentDate(nextWeek);
   };
 
-  // Açılır pencereyi açma işlevi
-  const openPopup = (employeeId, date) => {
-    setSelectedEmployee(employeeId);
-    setSelectedDate(date);
-    setPopupOpen(true);
-  };
-
-  // Açılır pencereyi kapatma işlevi
-  const closePopup = () => {
-    setPopupOpen(false);
-  };
-
   // Belirli bir çalışan için seçim durumunu değiştir
   const toggleEmployeeSelect = (employeeId) => {
     setSelectedEmployees((prevState) => ({
@@ -145,6 +128,32 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     });
   };
 
+  useEffect(() => {
+    const isAnyEmployeeSelected = Object.values(selectedEmployees).some(
+      (selected) => selected
+    );
+    setIsAttendanceButtonDisabled(!isAnyEmployeeSelected);
+  }, [selectedEmployees]);
+
+  const handleOpenPopup = () => {
+    const selectedEmployeeNames = Object.keys(selectedEmployees)
+      .filter((employeeId) => selectedEmployees[employeeId])
+      .flatMap((employeeId) => {
+        const employee = admin.branches.flatMap((branch) =>
+          branch.manager.employees.filter(
+            (emp) => emp.id === parseInt(employeeId)
+          )
+        );
+        return employee.length > 0 ? employee[0].name : "";
+      });
+    setPopupEmployeeNames(selectedEmployeeNames);
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-evenly w-full mb-4">
@@ -166,7 +175,6 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       <table className="border-collapse border border-gray-300">
         <thead>
           <tr>
-            {" "}
             <th className="border border-gray-300">
               <input
                 type="checkbox"
@@ -200,6 +208,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                     onChange={() => toggleEmployeeSelect(employee.id)}
                   />
                 </td>
+
                 <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
                   <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
                 </td>
@@ -302,22 +311,38 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             ))}
         </tbody>
       </table>
-
+      <button
+        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+        type="button"
+        onClick={handleOpenPopup}
+        disabled={isAttendanceButtonDisabled}
+      >
+        YOKLAMA GİR
+      </button>
+      {showPopup && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-md">
+            <h2 className="text-lg font-semibold mb-4">Yoklama Gir</h2>
+            <ul>
+              {popupEmployeeNames.map((employee, index) => (
+                <li key={index}>{employee}</li>
+              ))}
+            </ul>
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded-full mt-4 font-medium hover:scale-105"
+              onClick={handleClosePopup}
+            >
+              Kapat
+            </button>
+          </div>
+        </div>
+      )}
       <button
         className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
         type="submit"
       >
         KAYDET
       </button>
-
-      {popupOpen && (
-        <Popup
-          handleSave={handleSaveAttendance}
-          handleClose={closePopup}
-          employeeId={selectedEmployee}
-          date={selectedDate}
-        />
-      )}
     </div>
   );
 };
