@@ -3,9 +3,12 @@ import React, { useState, useEffect } from "react";
 import useStore from "@/utils/store";
 import Link from "next/link";
 import { Formik, Form, Field } from "formik";
-import { FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight,
+import {
+  FaRegArrowAltCircleLeft,
+  FaRegArrowAltCircleRight,
 } from "react-icons/fa";
 import { FcInfo, FcViewDetails } from "react-icons/fc";
+import AttendancePopup from "../attendancepopup";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const { admin } = useStore.getState();
@@ -149,7 +152,6 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     setPopupEmployeeNames(selectedEmployeeNames);
     setShowPopup(true);
   };
-
   const handleClosePopup = () => {
     setShowPopup(false);
   };
@@ -204,7 +206,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                 <td className="px-3">
                   <input
                     type="checkbox"
-                    checked={selectedEmployees[employee.id]}
+                    checked={selectedEmployees[employee.id] || false}
                     onChange={() => toggleEmployeeSelect(employee.id)}
                   />
                 </td>
@@ -311,8 +313,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             ))}
         </tbody>
       </table>
+      <div className="flex items-center justify-center">
       <button
-        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105 mr-48"
         type="button"
         onClick={handleOpenPopup}
         disabled={isAttendanceButtonDisabled}
@@ -320,29 +323,21 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         YOKLAMA GİR
       </button>
       {showPopup && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-md">
-            <h2 className="text-lg font-semibold mb-4">Yoklama Gir</h2>
-            <ul>
-              {popupEmployeeNames.map((employee, index) => (
-                <li key={index}>{employee}</li>
-              ))}
-            </ul>
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded-full mt-4 font-medium hover:scale-105"
-              onClick={handleClosePopup}
-            >
-              Kapat
-            </button>
-          </div>
-        </div>
+        <AttendancePopup
+          popupEmployeeNames={popupEmployeeNames}
+          handleClosePopup={handleClosePopup}
+          handleSaveAttendance={handleSaveAttendance}
+          currentDate={currentDate}
+        />
       )}
+
       <button
         className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
         type="submit"
       >
         KAYDET
       </button>
+      </div>
     </div>
   );
 };
