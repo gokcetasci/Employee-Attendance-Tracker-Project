@@ -83,35 +83,40 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const getWeekDates = (date) => {
     const weekDates = [];
     const startOfWeek = new Date(date);
-
+  
     // Haftanın başlangıcını ayarla
     startOfWeek.setDate(startOfWeek.getDate());
-
-    // Eğer ekran küçükse (mobil), sadece bir sonraki günü ekle
-    if (window.innerWidth <= 768) {
-      for (let i = 0; i < 1; i++) {
-        const day = new Date(startOfWeek);
-        day.setDate(startOfWeek.getDate() + i);
-        weekDates.push(day);
-      }
-    } else if (window.innerWidth > 768 && window.innerWidth <= 1024) {
-      // Tablet ekranı ise 3 gün ekle
-      for (let i = 0; i < 3; i++) {
-        const day = new Date(startOfWeek);
-        day.setDate(startOfWeek.getDate() + i);
-        weekDates.push(day);
-      }
-    } else {
-      // Ekran büyükse (desktop), 7 gün ekle
-      for (let i = 0; i < 7; i++) {
-        const day = new Date(startOfWeek);
-        day.setDate(startOfWeek.getDate() + i);
-        weekDates.push(day);
+  
+    // Check if window is defined (client-side) before accessing window.innerWidth
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth <= 768) {
+        // Mobil ekran kontrolü
+        for (let i = 0; i < 1; i++) {
+          const day = new Date(startOfWeek);
+          day.setDate(startOfWeek.getDate() + i);
+          weekDates.push(day);
+        }
+      } else if (window.innerWidth > 768 && window.innerWidth <= 1024) {
+        // Tablet ekranı ise 3 gün ekle
+        for (let i = 0; i < 3; i++) {
+          const day = new Date(startOfWeek);
+          day.setDate(startOfWeek.getDate() + i);
+          weekDates.push(day);
+        }
+      } else {
+        // Ekran büyükse (desktop), 7 gün ekle
+        for (let i = 0; i < 7; i++) {
+          const day = new Date(startOfWeek);
+          day.setDate(startOfWeek.getDate() + i);
+          weekDates.push(day);
+        }
       }
     }
-
+  
     return weekDates;
   };
+  
+  
 
   // Haftanın tarihlerini alma işlevini kullanarak, bu haftanın tarihlerini güncelle
   const weekDates = getWeekDates(currentDate);
