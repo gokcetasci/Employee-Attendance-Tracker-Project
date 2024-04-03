@@ -86,13 +86,26 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
 
     // Haftanın başlangıcını ayarla
     startOfWeek.setDate(startOfWeek.getDate());
-
-    // Ekran boyutuna göre hafta günlerini ayarla
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      weekDates.push(day);
+    if (window.innerWidth <= 768) {
+      for (let i = 0; i < 1; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
+    } else if (window.innerWidth <= 1024) {
+      for (let i = 0; i < 3; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
+    } else {
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
     }
+    
 
     return weekDates;
   };
@@ -103,16 +116,29 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   // Önceki haftaya gitme işlevi
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
-    previousWeek.setDate(
-      previousWeek.getDate() - (window.innerWidth <= 768 ? 1 : 3)
-    );
+    let daysToSubtract;
+    if (window.innerWidth <= 768) {
+      daysToSubtract = 1; // Ekran küçükse 1 gün çıkar
+    } else if (window.innerWidth <= 1024) {
+      daysToSubtract = 3; // Ekran orta büyüklükteyse 3 gün çıkar
+    } else {
+      daysToSubtract = 7; // Ekran büyükse 7 gün çıkar
+    }
+    previousWeek.setDate(previousWeek.getDate() - daysToSubtract);
     setCurrentDate(previousWeek);
   };
 
-  // Sonraki haftaya gitme işlevi
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
-    nextWeek.setDate(nextWeek.getDate() + (window.innerWidth <= 768 ? 1 : 3));
+    let daysToAdd;
+    if (window.innerWidth <= 768) {
+      daysToAdd = 1; // Ekran küçükse 1 gün ekle
+    } else if (window.innerWidth <= 1024) {
+      daysToAdd = 3; // Ekran orta büyüklükteyse 3 gün ekle
+    } else {
+      daysToAdd = 7; // Ekran büyükse 7 gün ekle
+    }
+    nextWeek.setDate(nextWeek.getDate() + daysToAdd);
     setCurrentDate(nextWeek);
   };
 
@@ -200,8 +226,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             {getWeekDates(currentDate).map((date, index) => (
               <th
                 key={index}
-                className={`border border-gray-300 px-4 py-2 text-gray-600 text-sm ${
-                  index > 0 ? "hidden md:table-cell" : "" // İlk hücre dışındakileri mobilde gizle
+                className={`border border-gray-300 px-4 py-2 text-gray-600 text-sm
                 }`}
               >
                 <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
