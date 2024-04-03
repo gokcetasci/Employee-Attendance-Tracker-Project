@@ -19,7 +19,22 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isAttendanceButtonDisabled, setIsAttendanceButtonDisabled] =
     useState(true);
+    const [windowWidth, setWindowWidth] = useState(0);
 
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+  
+      // İlk render'dan sonra bir kez çalışır
+      handleResize();
+  
+      // Eğer pencere boyutu değişirse yeniden hesaplar
+      window.addEventListener("resize", handleResize);
+  
+      // useEffect hook'undan temizleme fonksiyonu
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
   // Yoklama kaydetme işlevi
   const handleSaveAttendance = (employeeId, date, values) => {
     const updatedAdmin = { ...admin };
@@ -86,13 +101,13 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
 
     // Haftanın başlangıcını ayarla
     startOfWeek.setDate(startOfWeek.getDate());
-    if (window.innerWidth <= 768) {
+    if (windowWidth <= 768) {
       for (let i = 0; i < 1; i++) {
         const day = new Date(startOfWeek);
         day.setDate(startOfWeek.getDate() + i);
         weekDates.push(day);
       }
-    } else if (window.innerWidth <= 1024) {
+    } else if (windowWidth <= 1024) {
       for (let i = 0; i < 3; i++) {
         const day = new Date(startOfWeek);
         day.setDate(startOfWeek.getDate() + i);
@@ -117,9 +132,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
     let daysToSubtract;
-    if (window.innerWidth <= 768) {
+    if (windowWidth <= 768) {
       daysToSubtract = 1; // Ekran küçükse 1 gün çıkar
-    } else if (window.innerWidth <= 1024) {
+    } else if (windowWidth <= 1024) {
       daysToSubtract = 3; // Ekran orta büyüklükteyse 3 gün çıkar
     } else {
       daysToSubtract = 7; // Ekran büyükse 7 gün çıkar
@@ -131,9 +146,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
     let daysToAdd;
-    if (window.innerWidth <= 768) {
+    if (windowWidth <= 768) {
       daysToAdd = 1; // Ekran küçükse 1 gün ekle
-    } else if (window.innerWidth <= 1024) {
+    } else if (windowWidth <= 1024) {
       daysToAdd = 3; // Ekran orta büyüklükteyse 3 gün ekle
     } else {
       daysToAdd = 7; // Ekran büyükse 7 gün ekle
