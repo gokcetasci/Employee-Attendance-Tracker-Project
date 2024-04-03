@@ -1,18 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import useStore from "@/utils/store";
 import GeneralCalendar from "@/components/generalcalendar";
 
 const AdminPage = () => {
-  const { admin } = useStore();
   const [allowPastAndFutureChanges, setAllowPastAndFutureChanges] =
     useState(false); // Geçmiş ve gelecek değişikliklere izin verme durumu
 
   return (
     <div className="container mx-auto">
-      <div>
-        <div className="mt-4 relative">
-        <span className="mr-2 text-xl font-medium text-gray-700">
+      <div className="mb-5 flex justify-end">
+        <div className="mt-4 relative flex flex-row">
+          <span className="mr-2 text-xl font-medium text-gray-700 ">
             Geçmiş ve gelecek tarihler için değişikliklere izin ver
           </span>
           <input
