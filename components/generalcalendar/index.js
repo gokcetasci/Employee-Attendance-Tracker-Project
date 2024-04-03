@@ -83,40 +83,19 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const getWeekDates = (date) => {
     const weekDates = [];
     const startOfWeek = new Date(date);
-  
+
     // Haftanın başlangıcını ayarla
     startOfWeek.setDate(startOfWeek.getDate());
-  
-    // Check if window is defined (client-side) before accessing window.innerWidth
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth <= 768) {
-        // Mobil ekran kontrolü
-        for (let i = 0; i < 1; i++) {
-          const day = new Date(startOfWeek);
-          day.setDate(startOfWeek.getDate() + i);
-          weekDates.push(day);
-        }
-      } else if (window.innerWidth > 768 && window.innerWidth <= 1024) {
-        // Tablet ekranı ise 3 gün ekle
-        for (let i = 0; i < 3; i++) {
-          const day = new Date(startOfWeek);
-          day.setDate(startOfWeek.getDate() + i);
-          weekDates.push(day);
-        }
-      } else {
-        // Ekran büyükse (desktop), 7 gün ekle
-        for (let i = 0; i < 7; i++) {
-          const day = new Date(startOfWeek);
-          day.setDate(startOfWeek.getDate() + i);
-          weekDates.push(day);
-        }
-      }
+
+    // Ekran boyutuna göre hafta günlerini ayarla
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      weekDates.push(day);
     }
-  
+
     return weekDates;
   };
-  
-  
 
   // Haftanın tarihlerini alma işlevini kullanarak, bu haftanın tarihlerini güncelle
   const weekDates = getWeekDates(currentDate);
@@ -124,30 +103,16 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   // Önceki haftaya gitme işlevi
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
-    if (typeof window !== 'undefined') {
-
-    if (window.innerWidth <= 768) {
-      // Mobil ekran kontrolü
-      previousWeek.setDate(previousWeek.getDate() - 1); // Mobilde 1 gün geri git
-    } else {
-      previousWeek.setDate(previousWeek.getDate() - 3); // Tablette 3 gün geri git
-    }
-  }
+    previousWeek.setDate(
+      previousWeek.getDate() - (window.innerWidth <= 768 ? 1 : 3)
+    );
     setCurrentDate(previousWeek);
   };
 
   // Sonraki haftaya gitme işlevi
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
-    if (typeof window !== 'undefined') {
-
-    if (window.innerWidth <= 768) {
-      // Mobil ekran kontrolü
-      nextWeek.setDate(nextWeek.getDate() + 1); // Mobilde 1 gün ileri git
-    } else {
-      nextWeek.setDate(nextWeek.getDate() + 3); // Tablette 3 gün ileri git
-    }
-  }
+    nextWeek.setDate(nextWeek.getDate() + (window.innerWidth <= 768 ? 1 : 3));
     setCurrentDate(nextWeek);
   };
 
@@ -219,6 +184,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       </div>
 
       <table className="border-collapse border border-gray-300">
+        {/* Table head */}
         <thead>
           <tr>
             <th className="border border-gray-300">
@@ -234,7 +200,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             {getWeekDates(currentDate).map((date, index) => (
               <th
                 key={index}
-                className="border border-gray-300 px-4 py-2  text-gray-600 text-sm"
+                className={`border border-gray-300 px-4 py-2 text-gray-600 text-sm ${
+                  index > 0 ? "hidden md:table-cell" : "" // İlk hücre dışındakileri mobilde gizle
+                }`}
               >
                 <p>{date.toLocaleDateString("tr-TR", { weekday: "short" })}</p>
                 <p>{date.toLocaleDateString("tr-TR")}</p>
@@ -242,6 +210,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
             ))}
           </tr>
         </thead>
+
         <tbody>
           {admin.branches
             .flatMap((branch) => branch.manager.employees)
