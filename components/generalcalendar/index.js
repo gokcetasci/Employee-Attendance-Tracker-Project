@@ -80,30 +80,63 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     return "";
   };
 
-  // Haftanın tarihlerini alma
   const getWeekDates = (date) => {
     const weekDates = [];
     const startOfWeek = new Date(date);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1);
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      weekDates.push(day);
+
+    // Haftanın başlangıcını ayarla
+    startOfWeek.setDate(startOfWeek.getDate());
+
+    // Eğer ekran küçükse (mobil), sadece bir sonraki günü ekle
+    if (window.innerWidth <= 768) {
+      for (let i = 0; i < 1; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
+    } else if (window.innerWidth > 768 && window.innerWidth <= 1024) {
+      // Tablet ekranı ise 3 gün ekle
+      for (let i = 0; i < 3; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
+    } else {
+      // Ekran büyükse (desktop), 7 gün ekle
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        weekDates.push(day);
+      }
     }
+
     return weekDates;
   };
+
+  // Haftanın tarihlerini alma işlevini kullanarak, bu haftanın tarihlerini güncelle
+  const weekDates = getWeekDates(currentDate);
 
   // Önceki haftaya gitme işlevi
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
-    previousWeek.setDate(previousWeek.getDate() - 7);
+    if (window.innerWidth <= 768) {
+      // Mobil ekran kontrolü
+      previousWeek.setDate(previousWeek.getDate() - 1); // Mobilde 1 gün geri git
+    } else {
+      previousWeek.setDate(previousWeek.getDate() - 3); // Tablette 3 gün geri git
+    }
     setCurrentDate(previousWeek);
   };
 
   // Sonraki haftaya gitme işlevi
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
-    nextWeek.setDate(nextWeek.getDate() + 7);
+    if (window.innerWidth <= 768) {
+      // Mobil ekran kontrolü
+      nextWeek.setDate(nextWeek.getDate() + 1); // Mobilde 1 gün ileri git
+    } else {
+      nextWeek.setDate(nextWeek.getDate() + 3); // Tablette 3 gün ileri git
+    }
     setCurrentDate(nextWeek);
   };
 
@@ -214,7 +247,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                 <td className="w-[150px] h-[50px] bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
                   <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
                 </td>
-                {getWeekDates(currentDate).map((date, index) => {
+                {weekDates.map((date, index) => {
                   const isClickable =
                     allowPastAndFutureChanges ||
                     date.toDateString() === new Date().toDateString();
@@ -314,29 +347,29 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         </tbody>
       </table>
       <div className="flex items-center justify-center">
-      <button
-        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105 mr-48"
-        type="button"
-        onClick={handleOpenPopup}
-        disabled={isAttendanceButtonDisabled}
-      >
-        YOKLAMA GİR
-      </button>
-      {showPopup && (
-        <AttendancePopup
-          popupEmployeeNames={popupEmployeeNames}
-          handleClosePopup={handleClosePopup}
-          handleSaveAttendance={handleSaveAttendance}
-          currentDate={currentDate}
-        />
-      )}
+        <button
+          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105 mr-48"
+          type="button"
+          onClick={handleOpenPopup}
+          disabled={isAttendanceButtonDisabled}
+        >
+          YOKLAMA GİR
+        </button>
+        {showPopup && (
+          <AttendancePopup
+            popupEmployeeNames={popupEmployeeNames}
+            handleClosePopup={handleClosePopup}
+            handleSaveAttendance={handleSaveAttendance}
+            currentDate={currentDate}
+          />
+        )}
 
-      <button
-        className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
-        type="submit"
-      >
-        KAYDET
-      </button>
+        <button
+          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+          type="submit"
+        >
+          KAYDET
+        </button>
       </div>
     </div>
   );
