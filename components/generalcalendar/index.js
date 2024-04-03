@@ -124,24 +124,30 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   // Önceki haftaya gitme işlevi
   const goToPreviousWeek = () => {
     const previousWeek = new Date(currentDate);
+    if (typeof window !== 'undefined') {
+
     if (window.innerWidth <= 768) {
       // Mobil ekran kontrolü
       previousWeek.setDate(previousWeek.getDate() - 1); // Mobilde 1 gün geri git
     } else {
       previousWeek.setDate(previousWeek.getDate() - 3); // Tablette 3 gün geri git
     }
+  }
     setCurrentDate(previousWeek);
   };
 
   // Sonraki haftaya gitme işlevi
   const goToNextWeek = () => {
     const nextWeek = new Date(currentDate);
+    if (typeof window !== 'undefined') {
+
     if (window.innerWidth <= 768) {
       // Mobil ekran kontrolü
       nextWeek.setDate(nextWeek.getDate() + 1); // Mobilde 1 gün ileri git
     } else {
       nextWeek.setDate(nextWeek.getDate() + 3); // Tablette 3 gün ileri git
     }
+  }
     setCurrentDate(nextWeek);
   };
 
