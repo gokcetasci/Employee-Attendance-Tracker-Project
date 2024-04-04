@@ -9,8 +9,8 @@ const AdminPage = () => {
   return (
     <div className="container mx-auto">
       <div className="mb-5 flex justify-end">
-        <div className="mt-4 relative flex flex-row">
-          <span className="mr-2 text-xl font-medium text-gray-700 ">
+        <div className="mt-4 relative flex flex-row rounded-md p-2 ">
+          <span className="mr-2 text-[16px] font-medium text-gray-700 ">
             Geçmiş ve gelecek tarihler için değişikliklere izin ver
           </span>
           <input
@@ -23,13 +23,13 @@ const AdminPage = () => {
           />
           <label
             htmlFor="allowChangesToggle"
-            className={`block w-14 h-8 bg-gray-300 rounded-full p-1 transition duration-300 ease-in-out ${
+            className={`block w-10 h-6 bg-gray-300 rounded-full p-1 transition duration-300 ease-in-out ${
               allowPastAndFutureChanges ? "bg-indigo-500" : ""
             }`}
           >
             <div
-              className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
-                allowPastAndFutureChanges ? "translate-x-6" : ""
+              className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                allowPastAndFutureChanges ? "translate-x-4" : ""
               }`}
             ></div>
           </label>
