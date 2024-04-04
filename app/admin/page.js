@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import GeneralCalendar from "@/components/generalcalendar";
-
+import { FcCalendar } from "react-icons/fc";
 const AdminPage = () => {
   const [allowPastAndFutureChanges, setAllowPastAndFutureChanges] =
     useState(false); // Geçmiş ve gelecek değişikliklere izin verme durumu
@@ -35,9 +35,14 @@ const AdminPage = () => {
           </label>
         </div>
       </div>
-
+  
+      
       <div className="bg-white rounded-xl p-10 shadow-2xl">
         {/* Admin Takvimi */}
+        <div className="flex flex-row items-center gap-2 pb-3 border-b mb-3 border-indigo-200">  
+          <span><FcCalendar className="w-6 h-6"/></span>
+          <h1 className="text-indigo-500 font-semibold">Çalışan Yoklama Takvimi</h1>
+        </div>
         <GeneralCalendar
           allowPastAndFutureChanges={allowPastAndFutureChanges} // Geçmiş ve gelecek değişikliklere izin verme durumu
         />
