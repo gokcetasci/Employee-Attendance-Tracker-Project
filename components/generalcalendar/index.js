@@ -76,17 +76,32 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     toggleEditMode(employeeId, date);
   };
 
-  // Çalışanın belirli bir tarihte yoklama bilgisini alma
-  const getAttendanceStatus = (employeeId, date) => {
-    const employee = admin.branches
-      .flatMap((branch) => branch.manager.employees)
-      .find((employee) => employee.id === employeeId);
-    if (employee) {
-      const attendance = employee.attendance.find((a) => a.date === date);
-      return attendance && attendance.status !== null ? attendance.status : "";
-    }
-    return "Bilgi yok";
-  };
+// Çalışanın belirli bir tarihte yoklama durumunu alma
+const getAttendanceStatus = (employeeId, date) => {
+  const employee = admin.branches
+    .flatMap((branch) => branch.manager.employees)
+    .find((employee) => employee.id === employeeId);
+  if (employee) {
+    const attendance = employee.attendance.find((a) => a.date === date);
+    return attendance && attendance.status !== null ? attendance.status : "";
+  }
+  return "Bilgi yok";
+};
+
+// Her hücre için arka plan rengini belirleme işlevi
+const getCellBackgroundColor = (employeeId, date) => {
+  const status = getAttendanceStatus(employeeId, date);
+  switch (status) {
+    case "Geldi":
+      return "bg-green-200";
+    case "Gelmedi":
+      return "bg-red-200";
+    case "İzinli":
+      return "bg-yellow-200";
+    default:
+      return "";
+  }
+};
 
   // Çalışanın explanation bilgisini alma
   const getExplanation = (employeeId, date) => {
@@ -299,9 +314,10 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
 
                   return (
                     <td
-                      key={index}
-                      className="border border-gray-300 px-2 py-2"
-                    >
+                    key={index}
+                    className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(employee.id, date.toISOString().split("T")[0])}`}
+                  >
+              
                       <div className="flex flex-row gap-2 items-center justify-center">
                         <p>{attendanceStatus}</p>
                         {attendanceStatus === "Gelmedi" && explanation && (
