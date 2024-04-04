@@ -15,9 +15,9 @@ function Header() {
   };
 
   return (
-    <div className="w-full h-24 p-2 bg-slate-100">
+    <div className="w-full bg-slate-100">
       <div
-        className="flex flex-row mx-3 my-2 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-md justify-between py-2 px-5"
+        className="flex flex-row  bg-gradient-to-r from-blue-200 to-indigo-200 rounded-md justify-between py-2 px-5"
         style={{ boxShadow: "0 0 4px #cbd5e1" }}
       >
         <div className="relative flex flex-row items-center justify-center ">
