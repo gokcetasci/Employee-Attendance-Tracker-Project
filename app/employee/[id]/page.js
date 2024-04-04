@@ -19,9 +19,6 @@ function EmployeePage({ params }) {
     branch.manager.employees.some((emp) => emp.id === employeeId)
   );
 
-  // Employee'nin katılım bilgilerini al
-  const attendanceData = employee.attendance;
-
   return (
     <div className="w-full h-screen bg-slate-50">
       <div className="px-12 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
@@ -43,21 +40,6 @@ function EmployeePage({ params }) {
      
       {/* PersonalCalendar bileşenini çağırıyoruz ve ilgili işçinin bilgilerini aktarıyoruz */}
       <PersonalCalendar employee={employee} />
-
-       {/* Katılım bilgilerini göster */}
-       <div className="px-12 py-3">
-        <h3 className="text-lg font-bold text-blue-800">Katılım Bilgileri:</h3>
-        <ul className="list-disc list-inside">
-          {attendanceData.map((attendance, index) => (
-            <li key={index}>
-              {attendance.date} - {attendance.status}
-              {attendance.explanation && (
-                <span> ({attendance.explanation})</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
 
     </div>
   );
