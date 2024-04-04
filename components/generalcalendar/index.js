@@ -7,8 +7,10 @@ import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
 } from "react-icons/fa";
-import { FcInfo, FcViewDetails } from "react-icons/fc";
+import { FcAbout, FcViewDetails, FcAddDatabase,FcDatabase,FcCheckmark } from "react-icons/fc";
 import AttendancePopup from "../attendancepopup";
+import { IoMdClose } from "react-icons/io";
+import { TbEditCircle } from "react-icons/tb";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const { admin } = useStore.getState();
@@ -303,9 +305,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                       <div className="flex flex-row gap-2 items-center justify-center">
                         <p>{attendanceStatus}</p>
                         {attendanceStatus === "Gelmedi" && explanation && (
-                          <div className="relative">
-                            <FcInfo
-                              className="text-gray-600 cursor-pointer"
+                          <div  className="relative">
+                            <FcAbout
+                              className="cursor-pointer hover:scale-105"
                               size={20}
                               title={explanation}
                             />
@@ -315,7 +317,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                           <button
                             onClick={() => toggleEditMode(employee.id, date)}
                           >
-                            Edit
+                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5"/>
                           </button>
                         )}
 
@@ -356,8 +358,8 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                                   </Field>
 
                                   {values.explanationVisible && (
-                                    <div className="flex items-center relative">
-                                      <FcViewDetails
+                                    <div className="flex items-center relative gap-1">
+                                      <FcAddDatabase
                                         onClick={() =>
                                           setDropdownVisible((prevState) => ({
                                             ...prevState,
@@ -365,18 +367,23 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                                               !prevState[employee.id],
                                           }))
                                         }
-                                        className="text-gray-600 cursor-pointer w-6 h-6 hover:scale-105"
+                                        className="cursor-pointer w-6 h-6 hover:scale-105"
                                         size={20}
                                       />
                                       <div className="dropdown-menu absolute top-0 left-10 z-10">
                                         {dropdownVisible[employee.id] && (
-                                          <div className="bg-slate-50 p-4 border border-gray-300 shadow-2xl rounded-md">
+                                          <div className="bg-slate-50 p-4 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
                                             <Field
                                               className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
                                               type="text"
                                               name="explanation"
                                               placeholder="Neden Gelmedi?"
                                             />
+                                            <button className="hover:scale-105">
+                                            <FcCheckmark className="w-6 h-6"/>
+                                            </button>
+                                            <button className="hover:scale-105 ">
+                                            <IoMdClose className="w-6 h-6 text-red-400"/>                        </button>
                                           </div>
                                         )}
                                       </div>
