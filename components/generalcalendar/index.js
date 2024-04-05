@@ -7,12 +7,17 @@ import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
 } from "react-icons/fa";
-import { FcAbout, FcViewDetails, FcAddDatabase,FcDatabase,FcCheckmark } from "react-icons/fc";
+import { FcAbout, FcAddDatabase, FcCheckmark } from "react-icons/fc";
 import AttendancePopup from "../attendancepopup";
 import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
+import EditForm from "../editform";
 
-const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
+const GeneralCalendar = ({
+  allowPastAndFutureChanges,
+  editEmployeeId,
+  editDate,
+}) => {
   const { admin } = useStore.getState();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEmployees, setSelectedEmployees] = useState({});
@@ -23,6 +28,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
     useState(true);
   const [windowWidth, setWindowWidth] = useState(0);
   const [editMode, setEditMode] = useState({});
+  const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -73,35 +79,34 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
       }
       useStore.setState({ admin: updatedAdmin });
     }
-    toggleEditMode(employeeId, date);
   };
 
-// Çalışanın belirli bir tarihte yoklama durumunu alma
-const getAttendanceStatus = (employeeId, date) => {
-  const employee = admin.branches
-    .flatMap((branch) => branch.manager.employees)
-    .find((employee) => employee.id === employeeId);
-  if (employee) {
-    const attendance = employee.attendance.find((a) => a.date === date);
-    return attendance && attendance.status !== null ? attendance.status : "";
-  }
-  return "Bilgi yok";
-};
+  // Çalışanın belirli bir tarihte yoklama durumunu alma
+  const getAttendanceStatus = (employeeId, date) => {
+    const employee = admin.branches
+      .flatMap((branch) => branch.manager.employees)
+      .find((employee) => employee.id === employeeId);
+    if (employee) {
+      const attendance = employee.attendance.find((a) => a.date === date);
+      return attendance && attendance.status !== null ? attendance.status : "";
+    }
+    return "Bilgi yok";
+  };
 
-// Her hücre için arka plan rengini belirleme işlevi
-const getCellBackgroundColor = (employeeId, date) => {
-  const status = getAttendanceStatus(employeeId, date);
-  switch (status) {
-    case "Geldi":
-      return "bg-green-200";
-    case "Gelmedi":
-      return "bg-red-200";
-    case "İzinli":
-      return "bg-yellow-200";
-    default:
-      return "";
-  }
-};
+  // Her hücre için arka plan rengini belirleme işlevi
+  const getCellBackgroundColor = (employeeId, date) => {
+    const status = getAttendanceStatus(employeeId, date);
+    switch (status) {
+      case "Geldi":
+        return "bg-green-200";
+      case "Gelmedi":
+        return "bg-red-200";
+      case "İzinli":
+        return "bg-yellow-200";
+      default:
+        return "";
+    }
+  };
 
   // Çalışanın explanation bilgisini alma
   const getExplanation = (employeeId, date) => {
@@ -230,13 +235,20 @@ const getCellBackgroundColor = (employeeId, date) => {
   const handleClosePopup = () => {
     setShowPopup(false);
   };
-  
-  // Düzenleme modunu açma fonksiyonu
-  const toggleEditMode = (employeeId, date) => {
-    setEditMode((prevEditMode) => ({
-      ...prevEditMode,
-      [`${employeeId}_${date}`]: !prevEditMode[`${employeeId}_${date}`],
-    }));
+
+  // Seçili çalışan ve tarihe göre edit modunu başlat
+  const startEditMode = (employeeId, date) => {
+    setEditMode({ [`${employeeId}_${date}`]: true });
+    setShowEditForm(true);
+  };
+
+  // Edit modunu bitir
+  const endEditMode = () => {
+    setEditMode({});
+    setShowEditForm(false);
+  };
+  const handleEditClick = (employeeId, date) => {
+    startEditMode(employeeId, date);
   };
 
   return (
@@ -256,7 +268,7 @@ const getCellBackgroundColor = (employeeId, date) => {
         </button>
       </div>
 
-     {/* Table */}
+      {/* Table */}
       <table className="border-collapse border border-gray-300">
         <thead>
           <tr>
@@ -314,14 +326,16 @@ const getCellBackgroundColor = (employeeId, date) => {
 
                   return (
                     <td
-                    key={index}
-                    className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(employee.id, date.toISOString().split("T")[0])}`}
-                  >
-              
+                      key={index}
+                      className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(
+                        employee.id,
+                        date.toISOString().split("T")[0]
+                      )}`}
+                    >
                       <div className="flex flex-row gap-2 items-center justify-center">
                         <p>{attendanceStatus}</p>
                         {attendanceStatus === "Gelmedi" && explanation && (
-                          <div  className="relative">
+                          <div className="relative">
                             <FcAbout
                               className="cursor-pointer hover:scale-105"
                               size={20}
@@ -329,12 +343,30 @@ const getCellBackgroundColor = (employeeId, date) => {
                             />
                           </div>
                         )}
-                        {attendanceStatus && (
+
+                        {attendanceStatus && allowPastAndFutureChanges ? (
+                          // Eğer allowPastAndFutureChanges true ise, her gün için edit simgesini göster
                           <button
-                            onClick={() => toggleEditMode(employee.id, date)}
+                            id="editicon"
+                            onClick={() => handleEditClick(employee.id, date)}
                           >
-                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5"/>
+                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
                           </button>
+                        ) : date.toDateString() === new Date().toDateString() &&
+                          attendanceStatus ? (
+                          // Eğer allowPastAndFutureChanges false ise, sadece mevcut gün için edit simgesini göster
+                          <button
+                            onClick={() => handleEditClick(employee.id, date)}
+                          >
+                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
+                          </button>
+                        ) : null}
+                        {showEditForm && (
+                          <EditForm
+                            editEmployeeId={editEmployeeId}
+                            editDate={editDate}
+                            handleClose={endEditMode}
+                          />
                         )}
 
                         {attendanceStatus === "" &&
@@ -396,10 +428,11 @@ const getCellBackgroundColor = (employeeId, date) => {
                                               placeholder="Neden Gelmedi?"
                                             />
                                             <button className="hover:scale-105">
-                                            <FcCheckmark className="w-6 h-6"/>
+                                              <FcCheckmark className="w-6 h-6" />
                                             </button>
                                             <button className="hover:scale-105 ">
-                                            <IoMdClose className="w-6 h-6 text-red-400"/>                        </button>
+                                              <IoMdClose className="w-6 h-6 text-red-400" />{" "}
+                                            </button>
                                           </div>
                                         )}
                                       </div>
@@ -419,7 +452,6 @@ const getCellBackgroundColor = (employeeId, date) => {
       </table>
 
       <div className="flex items-center justify-center">
-
         <button
           id="enterattendancebutton"
           className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105 mr-48"
@@ -445,7 +477,6 @@ const getCellBackgroundColor = (employeeId, date) => {
         >
           KAYDET
         </button>
-
       </div>
     </div>
   );
