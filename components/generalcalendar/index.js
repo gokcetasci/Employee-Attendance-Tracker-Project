@@ -14,9 +14,7 @@ import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
 
 const GeneralCalendar = ({
-  allowPastAndFutureChanges,
-  editEmployeeId,
-  editDate,
+  allowPastAndFutureChanges
 }) => {
   const { admin } = useStore.getState();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -250,7 +248,12 @@ const GeneralCalendar = ({
   const handleEditClick = (employeeId, date) => {
     startEditMode(employeeId, date);
   };
-
+  const handleSubmit = (values) => {
+    // handleSaveAttendance fonksiyonunu çağırarak yoklama bilgisini güncelle
+    handleSaveAttendance(editEmployeeId, editDate, values);
+    // handleClose fonksiyonunu çağırarak edit formu kapat
+    handleClose();
+};
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-evenly w-full mb-4">
@@ -363,9 +366,8 @@ const GeneralCalendar = ({
                         ) : null}
                         {showEditForm && (
                           <EditForm
-                            editEmployeeId={editEmployeeId}
-                            editDate={editDate}
                             handleClose={endEditMode}
+                            handleSaveAttendance={handleSaveAttendance}
                           />
                         )}
 
