@@ -28,8 +28,7 @@ function EmployeePage({ params }) {
         </div>
         <div className="flex flex-row gap-7">
           <p className="text-indigo-800">
-            <span className="text-blue-800 font-bold">Şube:</span>{" "}
-            {branch.name}
+            <span className="text-blue-800 font-bold">Şube:</span> {branch.name}
           </p>
           <p className="text-indigo-800">
             <span className="text-blue-800 font-bold">Müdür:</span>{" "}
@@ -37,10 +36,17 @@ function EmployeePage({ params }) {
           </p>
         </div>
       </div>
-     
       {/* PersonalCalendar bileşenini çağırıyoruz ve ilgili işçinin bilgilerini aktarıyoruz */}
       <PersonalCalendar employee={employee} />
-
+      {/* Grafiksel Gösterim */}
+      <div className="mt-4 flex flex-row items-center justify-center gap-2">
+        <div className="w-6 h-6 bg-green-300 rounded-full"></div>
+        <p>Geldi</p>
+        <div className="w-6 h-6 bg-red-300 rounded-full"></div>
+        <p>Gelmedi</p>
+        <div className="w-6 h-6 bg-yellow-300 rounded-full"></div>
+        <p>İzinli</p>
+      </div>
     </div>
   );
 }
