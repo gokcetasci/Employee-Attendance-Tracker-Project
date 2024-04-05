@@ -2,7 +2,9 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import useStore from "@/utils/store";
-
+import { FcAddDatabase } from "react-icons/fc";
+import { GoDotFill } from "react-icons/go";
+import { IoMdClose } from "react-icons/io";
 const AttendancePopup = ({
   popupEmployeeNames,
   handleClosePopup,
@@ -12,13 +14,13 @@ const AttendancePopup = ({
   const { admin } = useStore.getState();
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-md w-96">
-        <h2 className="text-lg font-semibold mb-4">Yoklama Gir</h2>
-        <ul className="mb-4">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
+      <div className="bg-white p-8 rounded-md w-96 relative">
+        <h2 className="text-lg font-semibold mb-4 flex flex-row items-center gap-2 text-blue-600"><FcAddDatabase className="w-6 h-6"/>Yoklama Bilgisi Gir</h2>
+        <ul className="mb-4 border-y py-2 border-indigo-200">
           {popupEmployeeNames.map((employee, index) => (
-            <li key={index} className="mb-1">
-              {employee}
+            <li key={index} className="mb-1 flex flex-row items-center gap-2 text-gray-600">
+              <GoDotFill className="text-blue-700"/>{employee}
             </li>
           ))}
         </ul>
@@ -69,7 +71,7 @@ const AttendancePopup = ({
                 {values.explanationVisible && (
                   <div className="relative">
                     <Field
-                      className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
+                      className="flex w-full gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
                       type="text"
                       name="explanation"
                       placeholder="Neden Gelmedi?"
@@ -79,16 +81,16 @@ const AttendancePopup = ({
 
                <div className="flex flex-row gap-3 justify-end">
                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-full mt-4 font-medium hover:scale-105"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-full mt-4 font-medium hover:scale-105 hover:bg-blue-700"
                   type="submit"
                 >
                   Gönder
                 </button>
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-full mt-4 font-medium hover:scale-105"
+                  className="absolute top-2 right-2 text-red-500 text-2xl hover:scale-105"
                   onClick={handleClosePopup}
                 >
-                  Kapat
+                  <IoMdClose />
                 </button>
                </div>
               </Form>
