@@ -24,7 +24,6 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
     useState(true);
   const [windowWidth, setWindowWidth] = useState(0);
   const [editMode, setEditMode] = useState({});
-  const [showEditForm, setShowEditForm] = useState(false);
   const { setAdmin } = useStore();
 
   //managerpage için çalışan filtreleme işlemleri
@@ -34,6 +33,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
       )
     : admin.branches.flatMap((branch) => branch.manager.employees);
 
+  //takvimin responsiveliği için eklendi
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -241,18 +241,17 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
     setShowPopup(false);
   };
 
-  // Seçili çalışan ve tarihe göre edit modunu başlat
+  // edit modunu başlat
   const startEditMode = (employeeId, date) => {
-    setEditMode({ [`${employeeId}_${date}`]: true });
-    setShowEditForm(true);
+    setEditMode({ ...editMode, [`${employeeId}_${date}`]: true });
   };
 
-  // Edit modunu bitir
+  // edit modunu bitir
   const endEditMode = () => {
     setEditMode({});
-    setShowEditForm(false);
   };
 
+  // Edit ikonuna tıklanınca
   const handleEditClick = (employeeId, date) => {
     startEditMode(employeeId, date);
   };
@@ -366,10 +365,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                           <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
                         </button>
                       ) : null}
-                      {showEditForm && (
+                      {editMode[`${employee.id}_${date}`] && (
                         <EditForm
                           handleClose={endEditMode}
                           handleSaveAttendance={handleSaveAttendance}
+                          employeeId={employee.id} // Pass the employeeId prop
+                          date={date} // Pass the date prop
                         />
                       )}
 
