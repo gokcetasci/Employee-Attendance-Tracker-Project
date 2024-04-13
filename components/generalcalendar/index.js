@@ -13,9 +13,7 @@ import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
 
-const GeneralCalendar = ({
-  allowPastAndFutureChanges
-}) => {
+const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const { admin } = useStore.getState();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEmployees, setSelectedEmployees] = useState({});
@@ -27,6 +25,7 @@ const GeneralCalendar = ({
   const [windowWidth, setWindowWidth] = useState(0);
   const [editMode, setEditMode] = useState({});
   const [showEditForm, setShowEditForm] = useState(false);
+  const { setAdmin } = useStore();
 
   useEffect(() => {
     const handleResize = () => {
@@ -75,8 +74,9 @@ const GeneralCalendar = ({
           explanation: values.status === "Gelmedi" ? values.explanation : "",
         });
       }
-      useStore.setState({ admin: updatedAdmin });
     }
+    setAdmin(updatedAdmin);
+    setDropdownVisible(false);
   };
 
   // Çalışanın belirli bir tarihte yoklama durumunu alma
@@ -245,15 +245,11 @@ const GeneralCalendar = ({
     setEditMode({});
     setShowEditForm(false);
   };
+
   const handleEditClick = (employeeId, date) => {
     startEditMode(employeeId, date);
   };
-  const handleSubmit = (values) => {
-    // handleSaveAttendance fonksiyonunu çağırarak yoklama bilgisini güncelle
-    handleSaveAttendance(editEmployeeId, editDate, values);
-    // handleClose fonksiyonunu çağırarak edit formu kapat
-    handleClose();
-};
+
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-evenly w-full mb-4">
@@ -296,6 +292,7 @@ const GeneralCalendar = ({
               </th>
             ))}
           </tr>
+          <tr></tr>
         </thead>
 
         <tbody>
@@ -376,8 +373,10 @@ const GeneralCalendar = ({
                           isClickable && (
                             <Formik
                               initialValues={{ status: "", explanation: "" }}
-                              onSubmit={(values) => {
+                              onSubmit={(values, { setSubmitting }) => {
+                                // Formu backend'e gönder
                                 handleSaveAttendance(employee.id, date, values);
+                                setSubmitting(false);
                               }}
                             >
                               {({ values, setFieldValue }) => (
@@ -393,11 +392,13 @@ const GeneralCalendar = ({
                                           "explanationVisible",
                                           true
                                         );
+                                        setDropdownVisible(true); // Dropdown menüyü göster
                                       } else {
                                         setFieldValue(
                                           "explanationVisible",
                                           false
                                         );
+                                        setDropdownVisible(false); // Dropdown menüyü gizle
                                       }
                                     }}
                                   >
@@ -406,7 +407,6 @@ const GeneralCalendar = ({
                                     <option value="Gelmedi">Gelmedi</option>
                                     <option value="İzinli">İzinli</option>
                                   </Field>
-
                                   {values.explanationVisible && (
                                     <div className="flex items-center relative gap-1">
                                       <FcAddDatabase
@@ -440,6 +440,13 @@ const GeneralCalendar = ({
                                       </div>
                                     </div>
                                   )}
+                                  <button
+                                    id="checkbutton"
+                                    type="submit"
+                                    className="hover:scale-105"
+                                  >
+                                    <FcCheckmark className="w-6 h-6" />
+                                  </button>
                                 </Form>
                               )}
                             </Formik>
@@ -471,14 +478,6 @@ const GeneralCalendar = ({
             currentDate={currentDate}
           />
         )}
-
-        <button
-          id="savebutton"
-          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
-          type="submit"
-        >
-          KAYDET
-        </button>
       </div>
     </div>
   );
