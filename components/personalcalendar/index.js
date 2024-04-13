@@ -87,10 +87,10 @@ function PersonalCalendar({ employee }) {
           let backgroundColor;
           if (currentRecord) {
             switch (currentRecord.status) {
-              case "gelmedi":
+              case "Gelmedi":
                 backgroundColor = "#f87171";
                 break;
-              case "izinli":
+              case "İzinli":
                 backgroundColor = "#fef08a";
                 break;
               default:
