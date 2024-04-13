@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const useStore = create(() => {
+const useStore = create((set) => {
   const admin = {
     id: 1,
     name: "John Doe",
@@ -89,6 +89,8 @@ const useStore = create(() => {
 
   return {
     admin,
+    setAdmin: (admin) => set({ admin })
+
   };
 });
 
