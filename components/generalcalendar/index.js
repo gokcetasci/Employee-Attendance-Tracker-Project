@@ -420,33 +420,45 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
                                         className="cursor-pointer w-6 h-6 hover:scale-105"
                                         size={20}
                                       />
-                                      <div className="dropdown-menu absolute top-0 left-10 z-10">
-                                        {dropdownVisible[employee.id] && (
-                                          <div className="bg-slate-50 p-4 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
+                                      {dropdownVisible[employee.id] && (
+                                        <div className="dropdown-menu absolute top-0 left-10 z-10 ">
+                                          <div className="bg-slate-50 px-4 py-6 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
                                             <Field
                                               className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
                                               type="text"
                                               name="explanation"
                                               placeholder="Neden Gelmedi?"
                                             />
-                                            <button className="hover:scale-105">
-                                              <FcCheckmark className="w-6 h-6" />
+                                            <button
+                                              className="absolute top-2 right-2 text-red-500 text-2xl hover:scale-105"
+                                              onClick={() => {
+                                                setDropdownVisible(false); // Dropdown menüyü kapat
+                                              }}
+                                            >
+                                              <IoMdClose/>
                                             </button>
-                                            <button className="hover:scale-105 ">
-                                              <IoMdClose className="w-6 h-6 text-red-400" />{" "}
+                                            <button
+                                              className="border border-gray-300 px-2 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 mr-6"
+                                              onClick={() => {
+                                                setDropdownVisible(false); // Dropdown menüyü kapat
+                                              }}
+                                            >
+                                              Ekle
                                             </button>
                                           </div>
-                                        )}
-                                      </div>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
-                                  <button
-                                    id="checkbutton"
-                                    type="submit"
-                                    className="hover:scale-105"
-                                  >
-                                    <FcCheckmark className="w-6 h-6" />
-                                  </button>
+                                  <div>
+                                    <button
+                                      id="checkbutton"
+                                      type="submit"
+                                      className="hover:scale-105"
+                                    >
+                                      <FcCheckmark className="w-5 h-5" />
+                                    </button>
+                                  </div>
                                 </Form>
                               )}
                             </Formik>
