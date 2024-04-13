@@ -13,7 +13,7 @@ import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
 
-const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
+const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const { admin } = useStore.getState();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEmployees, setSelectedEmployees] = useState({});
@@ -26,6 +26,13 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
   const [editMode, setEditMode] = useState({});
   const [showEditForm, setShowEditForm] = useState(false);
   const { setAdmin } = useStore();
+
+  //managerpage için çalışan filtreleme işlemleri
+  const filteredEmployees = managerId
+    ? admin.branches.flatMap((branch) =>
+        branch.manager.id === managerId ? branch.manager.employees : []
+      )
+    : admin.branches.flatMap((branch) => branch.manager.employees);
 
   useEffect(() => {
     const handleResize = () => {
@@ -296,179 +303,174 @@ const GeneralCalendar = ({ allowPastAndFutureChanges }) => {
         </thead>
 
         <tbody>
-          {admin.branches
-            .flatMap((branch) => branch.manager.employees)
-            .map((employee) => (
-              <tr key={employee.id}>
-                <td className="px-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedEmployees[employee.id] || false}
-                    onChange={() => toggleEmployeeSelect(employee.id)}
-                  />
-                </td>
+          {filteredEmployees.map((employee) => (
+            <tr key={employee.id}>
+              <td className="px-3">
+                <input
+                  type="checkbox"
+                  checked={selectedEmployees[employee.id] || false}
+                  onChange={() => toggleEmployeeSelect(employee.id)}
+                />
+              </td>
 
-                <td className="bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
-                  <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
-                </td>
-                {weekDates.map((date, index) => {
-                  const isClickable =
-                    allowPastAndFutureChanges ||
-                    date.toDateString() === new Date().toDateString();
-                  const attendanceStatus = getAttendanceStatus(
-                    employee.id,
-                    date.toISOString().split("T")[0]
-                  );
-                  const explanation = getExplanation(
-                    employee.id,
-                    date.toISOString().split("T")[0]
-                  );
+              <td className="bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
+                <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
+              </td>
+              {weekDates.map((date, index) => {
+                const isClickable =
+                  allowPastAndFutureChanges ||
+                  date.toDateString() === new Date().toDateString();
+                const attendanceStatus = getAttendanceStatus(
+                  employee.id,
+                  date.toISOString().split("T")[0]
+                );
+                const explanation = getExplanation(
+                  employee.id,
+                  date.toISOString().split("T")[0]
+                );
 
-                  return (
-                    <td
-                      key={index}
-                      className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(
-                        employee.id,
-                        date.toISOString().split("T")[0]
-                      )}`}
-                    >
-                      <div className="flex flex-row gap-2 items-center justify-center">
-                        <p>{attendanceStatus}</p>
-                        {attendanceStatus === "Gelmedi" && explanation && (
-                          <div className="relative">
-                            <FcAbout
-                              className="cursor-pointer hover:scale-105"
-                              size={20}
-                              title={explanation}
-                            />
-                          </div>
-                        )}
-
-                        {attendanceStatus && allowPastAndFutureChanges ? (
-                          // Eğer allowPastAndFutureChanges true ise, her gün için edit simgesini göster
-                          <button
-                            id="editicon"
-                            onClick={() => handleEditClick(employee.id, date)}
-                          >
-                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
-                          </button>
-                        ) : date.toDateString() === new Date().toDateString() &&
-                          attendanceStatus ? (
-                          // Eğer allowPastAndFutureChanges false ise, sadece mevcut gün için edit simgesini göster
-                          <button
-                            onClick={() => handleEditClick(employee.id, date)}
-                          >
-                            <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
-                          </button>
-                        ) : null}
-                        {showEditForm && (
-                          <EditForm
-                            handleClose={endEditMode}
-                            handleSaveAttendance={handleSaveAttendance}
+                return (
+                  <td
+                    key={index}
+                    className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(
+                      employee.id,
+                      date.toISOString().split("T")[0]
+                    )}`}
+                  >
+                    <div className="flex flex-row gap-2 items-center justify-center">
+                      <p>{attendanceStatus}</p>
+                      {attendanceStatus === "Gelmedi" && explanation && (
+                        <div className="relative">
+                          <FcAbout
+                            className="cursor-pointer hover:scale-105"
+                            size={20}
+                            title={explanation}
                           />
-                        )}
+                        </div>
+                      )}
 
-                        {attendanceStatus === "" &&
-                          !editMode[`${employee.id}_${date}`] &&
-                          isClickable && (
-                            <Formik
-                              initialValues={{ status: "", explanation: "" }}
-                              onSubmit={(values, { setSubmitting }) => {
-                                // Formu backend'e gönder
-                                handleSaveAttendance(employee.id, date, values);
-                                setSubmitting(false);
-                              }}
-                            >
-                              {({ values, setFieldValue }) => (
-                                <Form className="flex flex-row gap-2 text-sm">
-                                  <Field
-                                    className="w-[85px]  rounded-sm border border-indigo-400 text-gray-700 outline-none hover:border-indigo-600 p-1"
-                                    as="select"
-                                    name="status"
-                                    onChange={(e) => {
-                                      setFieldValue("status", e.target.value);
-                                      if (e.target.value === "Gelmedi") {
-                                        setFieldValue(
-                                          "explanationVisible",
-                                          true
-                                        );
-                                        setDropdownVisible(true); // Dropdown menüyü göster
-                                      } else {
-                                        setFieldValue(
-                                          "explanationVisible",
-                                          false
-                                        );
-                                        setDropdownVisible(false); // Dropdown menüyü gizle
+                      {attendanceStatus && allowPastAndFutureChanges ? (
+                        // Eğer allowPastAndFutureChanges true ise, her gün için edit simgesini göster
+                        <button
+                          id="editicon"
+                          onClick={() => handleEditClick(employee.id, date)}
+                        >
+                          <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
+                        </button>
+                      ) : date.toDateString() === new Date().toDateString() &&
+                        attendanceStatus ? (
+                        // Eğer allowPastAndFutureChanges false ise, sadece mevcut gün için edit simgesini göster
+                        <button
+                          onClick={() => handleEditClick(employee.id, date)}
+                        >
+                          <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
+                        </button>
+                      ) : null}
+                      {showEditForm && (
+                        <EditForm
+                          handleClose={endEditMode}
+                          handleSaveAttendance={handleSaveAttendance}
+                        />
+                      )}
+
+                      {attendanceStatus === "" &&
+                        !editMode[`${employee.id}_${date}`] &&
+                        isClickable && (
+                          <Formik
+                            initialValues={{ status: "", explanation: "" }}
+                            onSubmit={(values, { setSubmitting }) => {
+                              // Formu backend'e gönder
+                              handleSaveAttendance(employee.id, date, values);
+                              setSubmitting(false);
+                            }}
+                          >
+                            {({ values, setFieldValue }) => (
+                              <Form className="flex flex-row gap-2 text-sm">
+                                <Field
+                                  className="w-[85px]  rounded-sm border border-indigo-400 text-gray-700 outline-none hover:border-indigo-600 p-1"
+                                  as="select"
+                                  name="status"
+                                  onChange={(e) => {
+                                    setFieldValue("status", e.target.value);
+                                    if (e.target.value === "Gelmedi") {
+                                      setFieldValue("explanationVisible", true);
+                                      setDropdownVisible(true); // Dropdown menüyü göster
+                                    } else {
+                                      setFieldValue(
+                                        "explanationVisible",
+                                        false
+                                      );
+                                      setDropdownVisible(false); // Dropdown menüyü gizle
+                                    }
+                                  }}
+                                >
+                                  <option value="">Boş</option>
+                                  <option value="Geldi">Geldi</option>
+                                  <option value="Gelmedi">Gelmedi</option>
+                                  <option value="İzinli">İzinli</option>
+                                </Field>
+                                {values.explanationVisible && (
+                                  <div className="flex items-center relative gap-1">
+                                    <FcAddDatabase
+                                      onClick={() =>
+                                        setDropdownVisible((prevState) => ({
+                                          ...prevState,
+                                          [employee.id]:
+                                            !prevState[employee.id],
+                                        }))
                                       }
-                                    }}
-                                  >
-                                    <option value="">Boş</option>
-                                    <option value="Geldi">Geldi</option>
-                                    <option value="Gelmedi">Gelmedi</option>
-                                    <option value="İzinli">İzinli</option>
-                                  </Field>
-                                  {values.explanationVisible && (
-                                    <div className="flex items-center relative gap-1">
-                                      <FcAddDatabase
-                                        onClick={() =>
-                                          setDropdownVisible((prevState) => ({
-                                            ...prevState,
-                                            [employee.id]:
-                                              !prevState[employee.id],
-                                          }))
-                                        }
-                                        className="cursor-pointer w-6 h-6 hover:scale-105"
-                                        size={20}
-                                      />
-                                      {dropdownVisible[employee.id] && (
-                                        <div className="dropdown-menu absolute top-0 left-10 z-10 ">
-                                          <div className="bg-slate-50 px-4 py-6 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
-                                            <Field
-                                              className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
-                                              type="text"
-                                              name="explanation"
-                                              placeholder="Neden Gelmedi?"
-                                            />
-                                            <button
-                                              className="absolute top-2 right-2 text-red-500 text-2xl hover:scale-105"
-                                              onClick={() => {
-                                                setDropdownVisible(false); // Dropdown menüyü kapat
-                                              }}
-                                            >
-                                              <IoMdClose/>
-                                            </button>
-                                            <button
-                                              className="border border-gray-300 px-2 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 mr-6"
-                                              onClick={() => {
-                                                setDropdownVisible(false); // Dropdown menüyü kapat
-                                              }}
-                                            >
-                                              Ekle
-                                            </button>
-                                          </div>
+                                      className="cursor-pointer w-6 h-6 hover:scale-105"
+                                      size={20}
+                                    />
+                                    {dropdownVisible[employee.id] && (
+                                      <div className="dropdown-menu absolute top-0 left-10 z-10 ">
+                                        <div className="bg-slate-50 px-4 py-6 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
+                                          <Field
+                                            className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
+                                            type="text"
+                                            name="explanation"
+                                            placeholder="Neden Gelmedi?"
+                                          />
+                                          <button
+                                            className="absolute top-2 right-2 text-red-500 text-2xl hover:scale-105"
+                                            onClick={() => {
+                                              setDropdownVisible(false); // Dropdown menüyü kapat
+                                            }}
+                                          >
+                                            <IoMdClose />
+                                          </button>
+                                          <button
+                                            className="border border-gray-300 px-2 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 mr-6"
+                                            onClick={() => {
+                                              setDropdownVisible(false); // Dropdown menüyü kapat
+                                            }}
+                                          >
+                                            Ekle
+                                          </button>
                                         </div>
-                                      )}
-                                    </div>
-                                  )}
-                                  <div>
-                                    <button
-                                      id="checkbutton"
-                                      type="submit"
-                                      className="hover:scale-105"
-                                    >
-                                      <FcCheckmark className="w-5 h-5" />
-                                    </button>
+                                      </div>
+                                    )}
                                   </div>
-                                </Form>
-                              )}
-                            </Formik>
-                          )}
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                                )}
+                                <div>
+                                  <button
+                                    id="checkbutton"
+                                    type="submit"
+                                    className="hover:scale-105"
+                                  >
+                                    <FcCheckmark className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              </Form>
+                            )}
+                          </Formik>
+                        )}
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
         </tbody>
       </table>
 
