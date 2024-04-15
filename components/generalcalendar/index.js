@@ -12,6 +12,8 @@ import AttendancePopup from "../attendancepopup";
 import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
+import FilterPage from "../filter";
+import EmployeeFilter from "../employeefilter";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const { admin } = useStore.getState();
@@ -256,8 +258,31 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
     startEditMode(employeeId, date);
   };
 
+  //date filter
+  const handleFilterChange = (selectedDate) => {
+    console.log("Seçilen Tarih:", selectedDate);
+    setCurrentDate(new Date(selectedDate)); // Seçilen tarihi currentDate'e ayarla
+  };
+
+  // değişiklikleri local storage ile kaydetme
+  const handleSaveChanges = () => {
+    localStorage.setItem("adminData", JSON.stringify(admin));
+  };
+
+  useEffect(() => {
+    const savedAdminData = localStorage.getItem("adminData");
+    if (savedAdminData) {
+      setAdmin(JSON.parse(savedAdminData));
+    }
+  }, [setAdmin]);
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-row gap-24 mb-12">
+        <FilterPage handleFilterChange={handleFilterChange} />
+        <EmployeeFilter employees={filteredEmployees} />
+      </div>
+
       <div className="flex justify-evenly w-full mb-4">
         <button onClick={goToPreviousWeek}>
           <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
@@ -475,13 +500,19 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
         </tbody>
       </table>
 
-      <div className="flex items-center justify-center">
+      <div className="flex items-center gap-20">
         <button
           id="enterattendancebutton"
-          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105 mr-48"
+          className="bg-gradient-to-r from-green-600 to-cyan-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
           type="button"
           onClick={handleOpenPopup}
-          disabled={isAttendanceButtonDisabled}
+          disabled={
+            isAttendanceButtonDisabled ||
+            (!allowPastAndFutureChanges &&
+              !weekDates.some(
+                (date) => date.toDateString() === new Date().toDateString()
+              ))
+          }
         >
           YOKLAMA GİR
         </button>
@@ -493,6 +524,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
             currentDate={currentDate}
           />
         )}
+        <button
+          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+          onClick={handleSaveChanges}
+        >
+          Değişiklikleri Kaydet
+        </button>
       </div>
     </div>
   );
