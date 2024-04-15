@@ -5,7 +5,6 @@ import useStore from "@/utils/store";
 import { FcAddDatabase } from "react-icons/fc";
 import { GoDotFill } from "react-icons/go";
 import { IoMdClose } from "react-icons/io";
-
 const AttendancePopup = ({
   popupEmployeeNames,
   handleClosePopup,
@@ -30,7 +29,6 @@ const AttendancePopup = ({
             </li>
           ))}
         </ul>
-
         {/* Yoklama Formu */}
         {popupEmployeeNames.length > 0 && (
           <Formik
