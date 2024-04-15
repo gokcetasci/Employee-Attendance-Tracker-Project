@@ -31,7 +31,7 @@ const DateFilterPage = ({ handleFilterChange }) => {
             name="selectedDate"
             value={selectedDate}
             onChange={handleDateChange}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-orange-500 text-gray-500"
+            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 text-gray-500"
           />
         </div>
         <div className="flex items-center justify-center mt-6">
