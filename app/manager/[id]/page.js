@@ -5,7 +5,7 @@ import GeneralCalendar from "@/components/generalcalendar";
 import { FcAssistant } from "react-icons/fc";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaStore } from "react-icons/fa6";
-import { FcManager } from "react-icons/fc";
+import { FcCalendar } from "react-icons/fc";
 
 function ManagerPage({ params }) {
   const managerId = parseInt(params.id);
@@ -66,10 +66,15 @@ function ManagerPage({ params }) {
           </div>
         </div>
       </div>
-      <div></div>
-      <div className="mt-3 sm:mt-10">
+      <div className="bg-white rounded-xl p-10 shadow-2xl m-10">
+        {/* Admin Takvimi */}
+        <div className="flex flex-row items-center gap-2 pb-3 border-b mb-3 border-indigo-200">  
+          <span><FcCalendar className="w-6 h-6"/></span>
+          <h1 className="text-indigo-500 font-semibold">Çalışan Yoklama Takvimi</h1>
+        </div>
         <GeneralCalendar employees={managerEmployees} managerId={managerId} />
       </div>
+    
     </div>
   );
 }
