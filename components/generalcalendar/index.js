@@ -391,7 +391,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                 return (
                   <td
                     key={index}
-                    className={`border border-gray-300 xl:p-2 ${getCellBackgroundColor(
+                    className={`border border-gray-300 px-2 ${getCellBackgroundColor(
                       employee.id,
                       date.toISOString().split("T")[0]
                     )}`}
