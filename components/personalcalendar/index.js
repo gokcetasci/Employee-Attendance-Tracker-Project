@@ -4,13 +4,15 @@ import { FcInfo } from "react-icons/fc";
 import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
-  FaPlus,
 } from "react-icons/fa";
+import ExplanationModal from "../explanationmodal";
 
 function PersonalCalendar({ employee }) {
   const { attendance } = employee;
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalExplanation, setModalExplanation] = useState("");
 
   // Ayı değiştiren fonksiyon
   const changeMonth = (increment) => {
@@ -55,6 +57,12 @@ function PersonalCalendar({ employee }) {
   // Haftanın günlerini Türkçe olarak ayarla (Gerçek takvime uygun olarak)
   const turkishDayNames = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
 
+  //neden gelmedi bilgisi için modal
+  const handleExplanationClick = (explanation) => {
+    setModalExplanation(explanation);
+    setModalIsOpen(true);
+  };
+  
   return (
     <div className="mx-12 shadow-md bg-white rounded-md p-5">
       {/* Ay değiştirme butonları */}
@@ -72,7 +80,10 @@ function PersonalCalendar({ employee }) {
       {/* Haftanın günlerini gösteren satır */}
       <div className="grid grid-cols-3 sm:grid-cols-7 gap-1">
         {turkishDayNames.map((day, index) => (
-          <div key={index} className="items-center justify-center font-bold text-gray-800 hidden sm:flex">
+          <div
+            key={index}
+            className="items-center justify-center font-bold text-gray-800 hidden sm:flex"
+          >
             {day}
           </div>
         ))}
@@ -110,15 +121,25 @@ function PersonalCalendar({ employee }) {
               <div className="text-sm sm:text-md mt-1 font-medium">
                 {currentRecord ? currentRecord.status : "-"}
               </div>
-              {currentRecord && currentRecord.status === "gelmedi" && (
-                <div className="absolute top-0 right-0">
-                  <FcInfo
-                    className="text-gray-600 cursor-pointer"
-                    size={20}
-                    title={currentRecord.explanation}
-                  />
-                </div>
-              )}
+              {currentRecord &&
+                currentRecord.status === "Gelmedi" &&
+                currentRecord.explanation && (
+                  <div className="absolute top-1 right-1">
+                    <FcInfo
+                      className="text-gray-600 cursor-pointer"
+                      size={20}
+                      title={currentRecord.explanation}
+                      onClick={() =>
+                        handleExplanationClick(currentRecord.explanation)
+                      }
+                    />
+                    <ExplanationModal
+                      explanation={modalExplanation}
+                      isOpen={modalIsOpen}
+                      onRequestClose={() => setModalIsOpen(false)}
+                    />
+                  </div>
+                )}
             </div>
           );
         })}
