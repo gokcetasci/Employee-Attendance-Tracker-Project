@@ -6,14 +6,18 @@ import { Formik, Form, Field } from "formik";
 import {
   FaRegArrowAltCircleLeft,
   FaRegArrowAltCircleRight,
+  FaPlus,
 } from "react-icons/fa";
 import { FcAbout, FcAddDatabase, FcCheckmark } from "react-icons/fc";
 import AttendancePopup from "../attendancepopup";
 import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
-import FilterPage from "../filter";
+import DateFilterPage from "../filter";
 import EmployeeFilter from "../employeefilter";
+import ConfirmModal from "../comfirmmodal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const { admin } = useStore.getState();
@@ -27,6 +31,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const [windowWidth, setWindowWidth] = useState(0);
   const [editMode, setEditMode] = useState({});
   const { setAdmin } = useStore();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   //managerpage için çalışan filtreleme işlemleri
   const filteredEmployees = managerId
@@ -264,11 +269,33 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
     setCurrentDate(new Date(selectedDate)); // Seçilen tarihi currentDate'e ayarla
   };
 
-  // değişiklikleri local storage ile kaydetme
+  // Değişiklikleri kaydetme işlevi
   const handleSaveChanges = () => {
-    localStorage.setItem("adminData", JSON.stringify(admin));
+    setShowConfirmModal(true); // Kaydetme işleminden önce onay modalını aç
   };
 
+  // Onay modalını kapatma işlevi
+  const handleCloseConfirmModal = () => {
+    setShowConfirmModal(false);
+  };
+
+  // Değişiklikleri local storage ile kaydetme işlevi
+  const confirmSaveChanges = () => {
+    // Değişiklikleri kaydetme işlemini burada gerçekleştir
+    localStorage.setItem("adminData", JSON.stringify(admin));
+    setShowConfirmModal(false); // Onay modalını kapat
+
+    // Toastify bildirimi göster
+    toast.success("Değişiklikler başarıyla kaydedildi!", {
+      position: "top-right",
+      autoClose: 3000, // 3 saniye sonra otomatik kapanır
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
   useEffect(() => {
     const savedAdminData = localStorage.getItem("adminData");
     if (savedAdminData) {
@@ -278,14 +305,13 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-row gap-24 mb-12">
-        <FilterPage handleFilterChange={handleFilterChange} />
+      <div className="flex flex-col items-center sm:flex-row gap-6 sm:gap-24 mb-8 sm:mb-12 text-sm sm:text-md">
         <EmployeeFilter employees={filteredEmployees} />
+        <DateFilterPage handleFilterChange={handleFilterChange} />
       </div>
-
       <div className="flex justify-evenly w-full mb-4">
         <button onClick={goToPreviousWeek}>
-          <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
+          <FaRegArrowAltCircleLeft className="text-blue-400 w-6 h-6 hover:text-indigo-600 transition duration-300 ease-in-out transform  hover:scale-110" />
         </button>
         <h2 className="text-xl font-semibold text-gray-600">
           {currentDate.toLocaleDateString("tr-TR", {
@@ -294,7 +320,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
           })}
         </h2>
         <button onClick={goToNextWeek}>
-          <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 hover:scale-110" />
+          <FaRegArrowAltCircleRight className="text-blue-400 w-6 h-6 hover:text-indigo-600 transition duration-300 ease-in-out transform hover:scale-110" />
         </button>
       </div>
 
@@ -379,7 +405,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                           id="editicon"
                           onClick={() => handleEditClick(employee.id, date)}
                         >
-                          <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
+                          <TbEditCircle className="text-blue-700 transition duration-300 ease-in-out transform hover:scale-105 hover:text-blue-500 w-5 h-5" />
                         </button>
                       ) : date.toDateString() === new Date().toDateString() &&
                         attendanceStatus ? (
@@ -387,15 +413,15 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                         <button
                           onClick={() => handleEditClick(employee.id, date)}
                         >
-                          <TbEditCircle className="text-indigo-500 hover:scale-105 hover:text-indigo-800 w-5 h-5" />
+                          <TbEditCircle className="text-blue-700 transition duration-300 ease-in-out transform hover:scale-105 hover:text-blue-500 w-5 h-5" />
                         </button>
                       ) : null}
                       {editMode[`${employee.id}_${date}`] && (
                         <EditForm
                           handleClose={endEditMode}
                           handleSaveAttendance={handleSaveAttendance}
-                          employeeId={employee.id} // Pass the employeeId prop
-                          date={date} // Pass the date prop
+                          employeeId={employee.id}
+                          date={date}
                         />
                       )}
 
@@ -449,7 +475,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                                       size={20}
                                     />
                                     {dropdownVisible[employee.id] && (
-                                      <div className="dropdown-menu absolute top-0 left-10 z-10 ">
+                                      <div className="dropdown-menu absolute top-8 -right-6 md:-right-[320px] z-10 ">
                                         <div className="bg-slate-50 px-4 py-6 border border-gray-300 shadow-2xl rounded-md flex flex-row gap-3">
                                           <Field
                                             className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none"
@@ -500,10 +526,23 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
         </tbody>
       </table>
 
-      <div className="flex items-center gap-20">
+      <div>
+        <button
+          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+          onClick={handleSaveChanges}
+        >
+          Kaydet
+        </button>
+        <ConfirmModal
+          show={showConfirmModal}
+          handleClose={handleCloseConfirmModal}
+          confirmSaveChanges={confirmSaveChanges}
+        />
+      </div>
+      <div className="flex flex-row items-center justify-center mt-5">
         <button
           id="enterattendancebutton"
-          className="bg-gradient-to-r from-green-600 to-cyan-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
+          className=" flex flex-row bg-gradient-to-r from-blue-600 to-indigo-700  text-white pl-6 pr-8 py-2 rounded-full font-medium transition duration-300 ease-in-out transform hover:scale-105 relative"
           type="button"
           onClick={handleOpenPopup}
           disabled={
@@ -513,9 +552,14 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                 (date) => date.toDateString() === new Date().toDateString()
               ))
           }
+          style={{ display: isAttendanceButtonDisabled ? "none" : "block" }} // Burada eklenen kısım
         >
-          YOKLAMA GİR
+          <span className="mr-5">Yoklama Gir</span>
+          <span className="absolute -top-1 -right-2 text-white bg-gradient-to-r from-blue-600 to-indigo-700 p-3 border-4 border-white rounded-full transition duration-300 ease-in-out transform hover:scale-110">
+          <FaPlus />
+        </span>
         </button>
+        
         {showPopup && (
           <AttendancePopup
             popupEmployeeNames={popupEmployeeNames}
@@ -524,13 +568,8 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
             currentDate={currentDate}
           />
         )}
-        <button
-          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-8 py-2 rounded-full mt-5 font-medium hover:scale-105"
-          onClick={handleSaveChanges}
-        >
-          Değişiklikleri Kaydet
-        </button>
       </div>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 };
