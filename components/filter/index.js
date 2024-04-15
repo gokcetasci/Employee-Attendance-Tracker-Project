@@ -37,7 +37,7 @@ const DateFilterPage = ({ handleFilterChange }) => {
         </div>
         <div className="flex items-center justify-center mt-6">
           <button type="submit">
-            <FcFilledFilter className="w-6 h-6 hover:scale-105 text-gray-500" />
+            <FcFilledFilter className="w-6 h-6 transition duration-300 ease-in-out transform hover:scale-105 text-gray-500 " />
           </button>
         </div>
       </form>

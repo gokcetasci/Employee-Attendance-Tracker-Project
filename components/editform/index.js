@@ -17,7 +17,7 @@ const EditForm = ({ handleClose, handleSaveAttendance, employeeId, date }) => {
         <div className="absolute top-2 right-2">
           <button
             onClick={closeModal}
-            className="text-red-500 hover:text-red-700 hover:scale-110"
+            className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-110"
           >
             <IoMdClose className="w-6 h-6" />
           </button>
@@ -56,11 +56,11 @@ const EditForm = ({ handleClose, handleSaveAttendance, employeeId, date }) => {
                 <option value="İzinli">İzinli</option>
               </Field>
               
-              <div>
+              <div className="ml-4">
                 <button
                   id="checkbutton"
                   type="submit"
-                  className="hover:scale-105 bg-blue-600 px-4 py-2 rounded-md text-white ml-6"
+                  className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-6 py-2 rounded-full  font-medium transition duration-300 ease-in-out transform hover:scale-105"
                 >
                   Değiştir
                 </button>
@@ -69,7 +69,7 @@ const EditForm = ({ handleClose, handleSaveAttendance, employeeId, date }) => {
               <div>
               {values.explanationVisible && (
                 <Field
-                className="flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none w-full"
+                className=" flex gap-4 border-2 border-blue-300 rounded-md px-2 py-1 hover:border-indigo-400 outline-none w-full"
                   type="text"
                   name="explanation"
                   placeholder="Neden Gelmedi?"

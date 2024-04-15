@@ -49,7 +49,7 @@ const EmployeeFilter = ({ employees }) => {
   };
 
   return (
-    <div className="relative mt-6">
+    <div className="relative mt-8">
       <input
         type="text"
         placeholder="Çalışan ara..."
@@ -78,19 +78,19 @@ const EmployeeFilter = ({ employees }) => {
               className="text-red-600 hover:text-red-800"
               onClick={handlePrev}
             >
-              <FaChevronUp className="h-5 w-5 hover:scale-105" />
+              <FaChevronUp className="h-5 w-5 transition duration-300 ease-in-out transform hover:scale-105" />
             </button>
             <button
               className="text-red-600 hover:text-red-800"
               onClick={handleNext}
             >
-              <FaChevronDown className="h-5 w-5 hover:scale-105" />
+              <FaChevronDown className="h-5 w-5 transition duration-300 ease-in-out transform hover:scale-105" />
             </button>
           </div>
         )}
       </div>
       <FaChevronCircleDown
-        className="absolute top-5 right-3 transform -translate-y-1/2 h-5 w-5 text-orange-400 hover:scale-105"
+        className="absolute top-5 right-3 transform -translate-y-1/2 h-5 w-5 text-orange-400 transition duration-300 ease-in-out transform hover:scale-105"
         onClick={() => setDropdownVisible(!dropdownVisible)}
       />
     </div>

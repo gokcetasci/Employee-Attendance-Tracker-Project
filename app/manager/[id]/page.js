@@ -28,16 +28,16 @@ function ManagerPage({ params }) {
 
   return (
     <div>
-      <div className="px-12 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
-        <div className="flex flex-row items-center justify-center gap-4">
-          <FcAssistant className="w-10 p-1 h-10 rounded-full border border-1 border-gray-500 bg-white" />
-          <h2 className="font-extrabold text-blue-800">{name}</h2>
+      <div className="px-3 sm:px-12 sm:px-3 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
+        <div className="flex flex-row items-center justify-center gap-2 sm:gap-4">
+          <FcAssistant className="w-8 sm:w-10 h-8 sm:h-10 p-1  rounded-full border border-1 border-gray-500 bg-white" />
+          <h2 className=" text-sm sm:text-[16px] font-extrabold text-orange-700">{name}</h2>
         </div>
 
-        <div className="flex flex-row gap-7">
+        <div className="flex flex-row gap-2 sm:gap-7">
           <div className="relative flex flex-row items-center justify-center ">
-            <h1 className="text-blue-800 font-bold">Çalışanlar</h1>
-            <span className="pt-1 " onClick={toggleDropdown}>
+            <h1 className=" text-sm sm:text-[16px] text-blue-800 font-bold">Çalışanlar</h1>
+            <span onClick={toggleDropdown}>
               <MdKeyboardArrowDown className="w-6 h-6 text-indigo-800 hover:text-blue-500 hover:scale-110" />
             </span>{" "}
             {showDropdown && (
@@ -59,13 +59,15 @@ function ManagerPage({ params }) {
               </ul>
             )}
           </div>
-          <p className="text-indigo-800">
+          <div className="flex items-center justify-center">
+          <p className="text-indigo-800 text-sm sm:text-[16px]">
             <span className="text-blue-800 font-bold">Şube:</span> {branch.name}
           </p>
+          </div>
         </div>
       </div>
       <div></div>
-      <div className="mt-10">
+      <div className="mt-3 sm:mt-10">
         <GeneralCalendar employees={managerEmployees} managerId={managerId} />
       </div>
     </div>

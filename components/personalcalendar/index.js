@@ -1,7 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { FcInfo } from "react-icons/fc";
-
+import {
+  FaRegArrowAltCircleLeft,
+  FaRegArrowAltCircleRight,
+  FaPlus,
+} from "react-icons/fa";
 function PersonalCalendar({ employee }) {
   const { attendance } = employee;
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -54,20 +58,14 @@ function PersonalCalendar({ employee }) {
     <div className="m-12 shadow-md bg-white rounded-md p-5">
       {/* Ay değiştirme butonları */}
       <div className="mt-4 flex flex-row items-center justify-center gap-10 mb-10">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-          onClick={() => changeMonth(-1)}
-        >
-          Önceki Ay
+        <button onClick={() => changeMonth(-1)}>
+          <FaRegArrowAltCircleLeft className="text-pink-400 w-6 h-6 hover:text-indigo-600 transition duration-300 ease-in-out transform hover:scale-110" />
         </button>
-        <h3 className="text-lg font-bold mb-2">{`${
+        <h3 className="text-lg font-bold text-gray-600">{`${
           turkishMonthNames[month - 1]
         }/${year}`}</h3>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => changeMonth(1)}
-        >
-          Sonraki Ay
+        <button onClick={() => changeMonth(1)}>
+          <FaRegArrowAltCircleRight className="text-pink-400 w-6 h-6 hover:text-indigo-600 transition duration-300 ease-in-out transform hover:scale-110" />
         </button>
       </div>
       {/* Haftanın günlerini gösteren satır */}
@@ -102,10 +100,12 @@ function PersonalCalendar({ employee }) {
           return (
             <div
               key={index}
-              className="text-center border border-indigo-200 p-2 relative"
+              className="text-center border border-indigo-200 p-2 relative "
               style={{ backgroundColor }}
             >
-              <div className="text-gray-500">{dayOfMonth > 0 ? dayOfMonth : ""}</div>
+              <div className="text-gray-500">
+                {dayOfMonth > 0 ? dayOfMonth : ""}
+              </div>
               <div className="text-md mt-1 font-medium">
                 {currentRecord ? currentRecord.status : "-"}
               </div>
@@ -114,7 +114,7 @@ function PersonalCalendar({ employee }) {
                   <FcInfo
                     className="text-gray-600 cursor-pointer"
                     size={20}
-                    title={currentRecord.explanation} 
+                    title={currentRecord.explanation}
                   />
                 </div>
               )}
