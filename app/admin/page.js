@@ -10,7 +10,7 @@ const AdminPage = () => {
     <div className="container mx-auto">
       <div className="mb-5 flex justify-end">
         <div className=" mt-4 relative flex flex-row rounded-md items-center justify-center p-2 ">
-          <span className="mr-[4px] sm:mr-2 text-[12px]  sm:text-[16px] font-medium text-gray-700 ">
+          <span className="sm:mr-2 text-[13px]  sm:text-[16px] font-medium text-gray-700 ">
             Geçmiş ve gelecek tarihler için değişikliklere izin ver
           </span>
           <input

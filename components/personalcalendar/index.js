@@ -6,6 +6,7 @@ import {
   FaRegArrowAltCircleRight,
   FaPlus,
 } from "react-icons/fa";
+
 function PersonalCalendar({ employee }) {
   const { attendance } = employee;
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -55,7 +56,7 @@ function PersonalCalendar({ employee }) {
   const turkishDayNames = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
 
   return (
-    <div className="m-12 shadow-md bg-white rounded-md p-5">
+    <div className="mx-12 shadow-md bg-white rounded-md p-5">
       {/* Ay değiştirme butonları */}
       <div className="mt-4 flex flex-row items-center justify-center gap-10 mb-10">
         <button onClick={() => changeMonth(-1)}>
@@ -69,9 +70,9 @@ function PersonalCalendar({ employee }) {
         </button>
       </div>
       {/* Haftanın günlerini gösteren satır */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-3 sm:grid-cols-7 gap-1">
         {turkishDayNames.map((day, index) => (
-          <div key={index} className="text-center font-bold text-gray-800">
+          <div key={index} className="items-center justify-center font-bold text-gray-800 hidden sm:flex">
             {day}
           </div>
         ))}
@@ -106,7 +107,7 @@ function PersonalCalendar({ employee }) {
               <div className="text-gray-500">
                 {dayOfMonth > 0 ? dayOfMonth : ""}
               </div>
-              <div className="text-md mt-1 font-medium">
+              <div className="text-sm sm:text-md mt-1 font-medium">
                 {currentRecord ? currentRecord.status : "-"}
               </div>
               {currentRecord && currentRecord.status === "gelmedi" && (

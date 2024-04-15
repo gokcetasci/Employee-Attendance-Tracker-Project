@@ -21,6 +21,7 @@ function EmployeePage({ params }) {
 
   return (
     <div className="w-full h-screen bg-slate-50">
+      
       <div className="px-3 sm:px-12 sm:px-3 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
         <div className="flex flex-row items-center justify-center gap-2 sm:gap-4">
           <FcAssistant className="w-8 sm:w-10 h-8 sm:h-10 p-1 rounded-full border border-1 border-gray-500 bg-white" />
@@ -36,10 +37,8 @@ function EmployeePage({ params }) {
           </p>
         </div>
       </div>
-      {/* PersonalCalendar bileşenini çağırıyoruz ve ilgili işçinin bilgilerini aktarıyoruz */}
-      <PersonalCalendar employee={employee} />
-      {/* Grafiksel Gösterim */}
-      <div className="mt-4 flex flex-row items-center justify-center gap-2">
+          {/* Grafiksel Gösterim */}
+          <div className="flex flex-row items-center justify-center gap-2 py-10">
         <div className="w-6 h-6 bg-green-300 rounded-full"></div>
         <p>Geldi</p>
         <div className="w-6 h-6 bg-red-300 rounded-full"></div>
@@ -47,6 +46,9 @@ function EmployeePage({ params }) {
         <div className="w-6 h-6 bg-yellow-300 rounded-full"></div>
         <p>İzinli</p>
       </div>
+      {/* PersonalCalendar bileşenini çağırıyoruz ve ilgili işçinin bilgilerini aktarıyoruz */}
+      <PersonalCalendar employee={employee} />
+  
     </div>
   );
 }
