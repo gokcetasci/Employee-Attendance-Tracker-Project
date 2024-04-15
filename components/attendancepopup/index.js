@@ -5,6 +5,7 @@ import useStore from "@/utils/store";
 import { FcAddDatabase } from "react-icons/fc";
 import { GoDotFill } from "react-icons/go";
 import { IoMdClose } from "react-icons/io";
+
 const AttendancePopup = ({
   popupEmployeeNames,
   handleClosePopup,
@@ -16,7 +17,12 @@ const AttendancePopup = ({
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center ">
       <div className="bg-white p-8 rounded-md w-96 relative">
-        <h2 className="text-lg font-semibold mb-4 flex flex-row items-center gap-2 text-blue-600"><FcAddDatabase className="w-6 h-6"/>Yoklama Bilgisi Gir</h2>
+        {/* Başlık */}
+        <h2 className="text-lg font-semibold mb-4 flex flex-row items-center gap-2 text-blue-600">
+          <FcAddDatabase className="w-6 h-6" />
+          {`Yoklama Bilgisi - ${currentDate.toLocaleDateString("tr-TR")}`}
+        </h2>
+        {/* Çalışan Listesi */}
         <ul className="mb-4 border-y py-2 border-indigo-200">
           {popupEmployeeNames.map((employee, index) => (
             <li key={index} className="mb-1 flex flex-row items-center gap-2 text-gray-600">
@@ -25,6 +31,7 @@ const AttendancePopup = ({
           ))}
         </ul>
 
+        {/* Yoklama Formu */}
         {popupEmployeeNames.length > 0 && (
           <Formik
             initialValues={{
