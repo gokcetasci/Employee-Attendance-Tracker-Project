@@ -18,6 +18,7 @@ import EmployeeFilter from "../employeefilter";
 import ConfirmModal from "../comfirmmodal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ExplanationModal from "../explanationmodal";
 
 const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const { admin } = useStore.getState();
@@ -32,6 +33,8 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   const [editMode, setEditMode] = useState({});
   const { setAdmin } = useStore();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalExplanation, setModalExplanation] = useState("");
 
   //managerpage için çalışan filtreleme işlemleri
   const filteredEmployees = managerId
@@ -303,6 +306,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
     }
   }, [setAdmin]);
 
+  //neden gelmedi bilgisi için modal
+  const handleExplanationClick = (explanation) => {
+    setModalExplanation(explanation);
+    setModalIsOpen(true);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center text-[14px] sm:text-[16px]">
       <div className="flex flex-col items-center justify-center sm:flex-row gap-6 sm:gap-24 mb-8 sm:mb-12 text-sm sm:text-md">
@@ -363,7 +372,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                 />
               </td>
 
-              <td className="flex bg-blue-200 border px-4 py-2 flex items-center justify-center  font-semibold text-gray-800 hover:text-blue-500 text-[14px] sm:text-[16px] " >
+              <td className="flex bg-blue-200 border px-4 py-2 flex items-center justify-center  font-semibold text-gray-800 hover:text-blue-500 text-[14px] sm:text-[16px] ">
                 <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
               </td>
               {weekDates.map((date, index) => {
@@ -395,6 +404,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                             className="cursor-pointer hover:scale-105"
                             size={20}
                             title={explanation}
+                            onClick={() => handleExplanationClick(explanation)}
+                          />
+                          <ExplanationModal
+                            explanation={modalExplanation}
+                            isOpen={modalIsOpen}
+                            onRequestClose={() => setModalIsOpen(false)}
                           />
                         </div>
                       )}
@@ -556,10 +571,10 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
         >
           <span className="mr-5">Yoklama Gir</span>
           <span className="absolute -top-1 -right-2 text-white bg-gradient-to-r from-blue-600 to-indigo-700 p-3 border-4 border-white rounded-full transition duration-300 ease-in-out transform hover:scale-110">
-          <FaPlus />
-        </span>
+            <FaPlus />
+          </span>
         </button>
-        
+
         {showPopup && (
           <AttendancePopup
             popupEmployeeNames={popupEmployeeNames}
