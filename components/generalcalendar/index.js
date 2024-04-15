@@ -13,7 +13,7 @@ import AttendancePopup from "../attendancepopup";
 import { IoMdClose } from "react-icons/io";
 import { TbEditCircle } from "react-icons/tb";
 import EditForm from "../editform";
-import DateFilterPage from "../filter";
+import DateFilterPage from "../datefilter";
 import EmployeeFilter from "../employeefilter";
 import ConfirmModal from "../comfirmmodal";
 import { ToastContainer, toast } from "react-toastify";
@@ -304,8 +304,8 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
   }, [setAdmin]);
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center sm:flex-row gap-6 sm:gap-24 mb-8 sm:mb-12 text-sm sm:text-md">
+    <div className="flex flex-col items-center justify-center text-[14px] sm:text-[16px]">
+      <div className="flex flex-col items-center justify-center sm:flex-row gap-6 sm:gap-24 mb-8 sm:mb-12 text-sm sm:text-md">
         <EmployeeFilter employees={filteredEmployees} />
         <DateFilterPage handleFilterChange={handleFilterChange} />
       </div>
@@ -363,7 +363,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                 />
               </td>
 
-              <td className="bg-blue-200 border px-4 py-2 flex items-center justify-center text-[16px] font-semibold text-gray-800 hover:text-blue-500">
+              <td className="flex bg-blue-200 border px-4 py-2 flex items-center justify-center  font-semibold text-gray-800 hover:text-blue-500 text-[14px] sm:text-[16px] " >
                 <Link href={`/employee/${employee.id}`}>{employee.name}</Link>
               </td>
               {weekDates.map((date, index) => {
@@ -382,12 +382,12 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                 return (
                   <td
                     key={index}
-                    className={`border border-gray-300 px-2 py-2 ${getCellBackgroundColor(
+                    className={`border border-gray-300 xl:p-2 ${getCellBackgroundColor(
                       employee.id,
                       date.toISOString().split("T")[0]
                     )}`}
                   >
-                    <div className="flex flex-row gap-2 items-center justify-center">
+                    <div className="flex flex-row gap-2 items-center justify-center ">
                       <p>{attendanceStatus}</p>
                       {attendanceStatus === "Gelmedi" && explanation && (
                         <div className="relative">
@@ -439,7 +439,7 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                             {({ values, setFieldValue }) => (
                               <Form className="flex flex-row gap-2 text-sm">
                                 <Field
-                                  className="w-[85px]  rounded-sm border border-indigo-400 text-gray-700 outline-none hover:border-indigo-600 p-1"
+                                  className="w-[85px]  rounded-sm border border-indigo-400 text-gray-700 outline-none hover:border-indigo-600 p-1 "
                                   as="select"
                                   name="status"
                                   onChange={(e) => {
@@ -508,9 +508,9 @@ const GeneralCalendar = ({ allowPastAndFutureChanges, managerId }) => {
                                   <button
                                     id="checkbutton"
                                     type="submit"
-                                    className="hover:scale-105"
+                                    className="transition duration-300 ease-in-out transform hover:scale-110"
                                   >
-                                    <FcCheckmark className="w-5 h-5" />
+                                    <FcCheckmark className="w-5 h-5 stroke-2 text-green-700 hover:text-green-500" />
                                   </button>
                                 </div>
                               </Form>

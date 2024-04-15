@@ -9,8 +9,8 @@ const AdminPage = () => {
   return (
     <div className="container mx-auto">
       <div className="mb-5 flex justify-end">
-        <div className="mt-4 relative flex flex-row rounded-md p-2 ">
-          <span className="mr-2 text-[16px] font-medium text-gray-700 ">
+        <div className=" mt-4 relative flex flex-row rounded-md items-center justify-center p-2 ">
+          <span className="mr-[4px] sm:mr-2 text-[12px]  sm:text-[16px] font-medium text-gray-700 ">
             Geçmiş ve gelecek tarihler için değişikliklere izin ver
           </span>
           <input
@@ -37,7 +37,7 @@ const AdminPage = () => {
       </div>
   
       
-      <div className="bg-white rounded-xl p-10 shadow-2xl">
+      <div className="bg-white rounded-xl p-10 shadow-2xl ">
         {/* Admin Takvimi */}
         <div className="flex flex-row items-center gap-2 pb-3 border-b mb-3 border-indigo-200">  
           <span><FcCalendar className="w-6 h-6"/></span>

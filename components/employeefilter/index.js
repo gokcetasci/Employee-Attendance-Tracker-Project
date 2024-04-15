@@ -1,16 +1,28 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import {
-  FaChevronCircleDown,
-  FaChevronDown,
-  FaChevronUp,
-} from "react-icons/fa";
+import { FaChevronCircleDown, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const EmployeeFilter = ({ employees }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0); // Aktif çalışan index'i
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownVisible(false);
+      }
+    };
+
+    // Tüm sayfa üzerindeki tıklamaları dinle
+    window.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Event listener'ı temizle
+      window.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Arama sonucunda filtrelenmiş çalışanları al
   const filteredEmployees = employees.filter((employee) =>
@@ -49,16 +61,16 @@ const EmployeeFilter = ({ employees }) => {
   };
 
   return (
-    <div className="relative mt-8">
+    <div className="relative mt-7" ref={dropdownRef}>
       <input
         type="text"
         placeholder="Çalışan ara..."
         value={searchTerm}
         onChange={handleInputChange}
-        className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-orange-500"
+        className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 hover:border-blue-500"
       />
       <div
-        className="absolute left-0 w-full bg-white border border-gray-300 rounded-md shadow-md z-10 overflow-hidden"
+        className="absolute w-full bg-white border border-gray-300 rounded-md shadow-md z-10 overflow-hidden"
         style={{ display: dropdownVisible ? "block" : "none" }}
       >
         <ul className="divide-y divide-gray-300">
@@ -75,13 +87,13 @@ const EmployeeFilter = ({ employees }) => {
         {filteredEmployees.length > 4 && (
           <div className="flex justify-between px-4 pb-2">
             <button
-              className="text-red-600 hover:text-red-800"
+              className="text-blue-600 hover:text-blue-800"
               onClick={handlePrev}
             >
               <FaChevronUp className="h-5 w-5 transition duration-300 ease-in-out transform hover:scale-105" />
             </button>
             <button
-              className="text-red-600 hover:text-red-800"
+              className="text-blue-600 hover:text-blue-800"
               onClick={handleNext}
             >
               <FaChevronDown className="h-5 w-5 transition duration-300 ease-in-out transform hover:scale-105" />
@@ -90,7 +102,7 @@ const EmployeeFilter = ({ employees }) => {
         )}
       </div>
       <FaChevronCircleDown
-        className="absolute top-5 right-3 transform -translate-y-1/2 h-5 w-5 text-orange-400 transition duration-300 ease-in-out transform hover:scale-105"
+        className="absolute top-5 right-3 transform -translate-y-1/2 h-5 w-5 text-blue-600 transition duration-300 ease-in-out transform hover:scale-105"
         onClick={() => setDropdownVisible(!dropdownVisible)}
       />
     </div>
