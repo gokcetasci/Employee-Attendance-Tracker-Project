@@ -5,6 +5,7 @@ import { FcBusinessman } from "react-icons/fc";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaStore } from "react-icons/fa6";
 import { FcManager,FcAssistant } from "react-icons/fc";
+import Link from "next/link";
 
 function Header() {
   const { admin } = useStore();
@@ -32,12 +33,14 @@ function Header() {
                   key={branch.id}
                   className="py-1 px-3 cursor-pointer hover:bg-gray-100 "
                 >
+                  
                   <p className="flex flex-row items-center gap-2">
                     <FaStore className="text-indigo-600"/>
                     {branch.name}
                   </p>
                   <p className="pl-5 text-[14px] flex flex-row items-center gap-2">
-                    <FcManager />{branch.manager.name}
+                    <FcManager /><Link href={`/manager/${branch.manager.id}`}>{branch.manager.name}
+                    </Link>
                   </p>
                   <ul>
                     {branch.manager.employees.map((employee) => (

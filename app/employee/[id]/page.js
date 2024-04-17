@@ -25,7 +25,7 @@ function EmployeePage({ params }) {
       <div className="px-3 sm:px-12 sm:px-3 py-3 bg-gradient-to-r from-blue-400 to-indigo-200 flex flex-row items-center justify-between shadow-xl">
         <div className="flex flex-row items-center justify-center gap-2 sm:gap-4">
           <FcAssistant className="w-8 sm:w-10 h-8 sm:h-10 p-1 rounded-full border border-1 border-gray-500 bg-white" />
-          <h2 className="text-sm sm:text-[16px] font-extrabold text-orange-700">{employee.name}</h2>
+          <h2 className="text-sm sm:text-[16px] font-extrabold text-white">{employee.name}</h2>
         </div>
         <div className="flex flex-row gap-2 sm:gap-7 text-sm sm:text-[16px]">
           <p className="text-indigo-800">
