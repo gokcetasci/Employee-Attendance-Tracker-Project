@@ -49,7 +49,7 @@ This is an internship project. It will be integrated into the project later. The
 - **yes**: ^1.4.0,
 - **zustand**: ^4.5.2
 
-## While starting
+## Getting Started
 
 First run the development server:
 
